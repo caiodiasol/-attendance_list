@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes - Sistema de Ranking</title>
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-plus"></i>
+                <span>Cadastro de Clientes</span>
+            </div>
+            <div class="nav-links">
+                <a href="participar.html" class="nav-link">
+                    <i class="fas fa-play"></i> Participar
+                </a>
+                <a href="ranking.html" class="nav-link">
+                    <i class="fas fa-trophy"></i> Ranking
+                </a>
+                <a href="ranking-ganhadores.html" class="nav-link">
+                    <i class="fas fa-crown"></i> Ganhadores
+                </a>
+                <a href="../index.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard Admin
+                </a>
+                <a href="cadastro-clientes.html" class="nav-link active">
+                    <i class="fas fa-user-plus"></i> Cadastro
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Cadastro de Clientes</h1>
+                    <p>Cadastre-se para participar do ranking de prêmios.</p>
+                    <p>Sua pontuação será definida pelo acerto da palavra-chave exibida na live!</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Registration Form -->
+            <section class="form-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-plus"></i> Realize seu Cadastro</h2>
+                        <p>Preencha seus dados para participar do ranking da live!</p>
+                    </div>
+                    <form id="clientForm" class="client-form">
+                        <div class="form-group">
+                            <label for="clientName">
+                                <i class="fas fa-user"></i> Nome Completo
+                            </label>
+                            <input 
+                                type="text" 
+                                id="clientName" 
+                                name="name" 
+                                placeholder="Digite seu nome completo"
+                                required
+                                autocomplete="name"
+                            >
+                            <span class="error-message" id="nameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clientWhatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="clientWhatsapp" 
+                                name="whatsapp" 
+                                placeholder="(11) 99999-9999"
+                                required
+                                autocomplete="tel"
+                            >
+                            <span class="error-message" id="whatsappError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clientEmail">
+                                <i class="fas fa-envelope"></i> E-mail
+                            </label>
+                            <input 
+                                type="email" 
+                                id="clientEmail" 
+                                name="email" 
+                                placeholder="Digite seu e-mail"
+                                required
+                                autocomplete="email"
+                            >
+                            <span class="error-message" id="emailError"></span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Realizar Cadastro
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="clearForm()">
+                                <i class="fas fa-times"></i> Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+    
+    <!-- Firebase Status -->
+    <div id="firebaseStatus" class="firebase-status">
+        <i class="fas fa-cloud"></i> Conectado ao Firebase
+    </div>
+
+    <!-- Firebase Configuration -->
+    <script type="module" src="../firebase-config.js"></script>
+    <script src="../assets/js/cadastro-clientes.js"></script>
+</body>
+</html>

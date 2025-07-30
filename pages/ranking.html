@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Presença - Live Stream Competition</title>
+    <link rel="stylesheet" href="../assets/css/ranking.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-trophy"></i>
+                    <span class="logo-text">Live Ranking</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="cadastro-clientes.html" class="nav-item">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <a href="participar.html" class="nav-item">
+                        <i class="fas fa-play"></i>
+                        <span>Participar</span>
+                    </a>
+                    <a href="ranking.html" class="nav-item active">
+                        <i class="fas fa-trophy"></i>
+                        <span>Ranking</span>
+                    </a>
+                    <a href="ranking-ganhadores.html" class="nav-item">
+                        <i class="fas fa-crown"></i>
+                        <span>Ganhadores</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="stat-value" id="totalPoints">0</span>
+                        <span class="stat-label">Pontos Hoje</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-value" id="activeParticipants">0</span>
+                        <span class="stat-label">Participantes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-chart-line"></i> Controles do Ranking</h2>
+                    <div class="panel-actions">
+                        <button id="executeAwardBtn" onclick="executeAward()" class="btn-award">
+                            <i class="fas fa-trophy"></i>
+                            Confirmar Premiação
+                        </button>
+                        <button id="resetRankingBtn" onclick="resetRanking()" class="btn-reset">
+                            <i class="fas fa-trash-alt"></i>
+                            Zerar Ranking
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <div class="info-card">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="info-text">
+                            <h3>Como Funciona</h3>
+                            <p>Os clientes cadastrados podem participar digitando palavras-chave na <a href="participar.html">página de participação</a>. Este dashboard mostra o ranking em tempo real. Ao confirmar a premiação, os ganhadores são salvos e o ranking é zerado automaticamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Content Grid -->
+            <div class="dashboard-grid">
+                <!-- Ranking Section -->
+                <section class="ranking-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-trophy"></i> Ranking de Presença</h2>
+                    </div>
+                    
+                    
+                    <div class="ranking-container">
+                        <!-- Top 3 Podium -->
+                        <div id="podium" class="podium" style="display: none;">
+                            <div class="podium-place second">
+                                <div class="podium-avatar">
+                                    <span class="position">2</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-2-name">-</div>
+                                    <div class="podium-points" id="podium-2-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar second-bar"></div>
+                            </div>
+                            
+                            <div class="podium-place first">
+                                <div class="podium-crown">👑</div>
+                                <div class="podium-avatar winner">
+                                    <span class="position">1</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-1-name">-</div>
+                                    <div class="podium-points" id="podium-1-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar first-bar"></div>
+                            </div>
+                            
+                            <div class="podium-place third">
+                                <div class="podium-avatar">
+                                    <span class="position">3</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-3-name">-</div>
+                                    <div class="podium-points" id="podium-3-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar third-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Full Ranking List -->
+                        <div class="ranking-list-container">
+                            <div id="rankingList" class="ranking-list">
+                                <div class="empty-state">
+                                    <i class="fas fa-trophy"></i>
+                                    <h3>Nenhum ponto adicionado ainda</h3>
+                                    <p>Comece adicionando palavras-chave para ver o ranking!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Activity Feed -->
+                <section class="activity-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Atividade Recente</h2>
+                        <button id="clearRecentBtn" onclick="clearRecentPoints()" class="btn-clear">
+                            <i class="fas fa-trash"></i>
+                            Limpar
+                        </button>
+                    </div>
+                    
+                    <div class="activity-container">
+                        <div id="recentPointsList" class="activity-list">
+                            <div class="empty-state">
+                                <i class="fas fa-clock"></i>
+                                <h3>Nenhuma atividade hoje</h3>
+                                <p>As ações recentes aparecerão aqui</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Firebase Configuration -->
+    <script type="module" src="../firebase-config.js"></script>
+    <script src="../assets/js/ranking.js"></script>
+</body>
+</html>
