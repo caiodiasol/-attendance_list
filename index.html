@@ -3,175 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Administrador - Sistema de Ranking</title>
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>ClientKey - Sistema de Ranking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(#0f172a);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            --text-primary: #2c3e50;
+            --text-secondary: #34495e;
+            --text-muted: #7f8c8d;
+            --primary-color: #27ae60;
+            --success-color: #2ecc71;
+        }
+        
+        .redirect-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 500px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .logo i {
+            color: white;
+            font-size: 36px;
+        }
+        
+        h1 {
+            color: var(--text-primary);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .option-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .admin-option .option-icon {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+        }
+        
+        .option-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .option-content p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+        
+        .redirect-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        .loading.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e1e8ed;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fas fa-users"></i>
-                <span>Dashboard Administrador</span>
-            </div>
-            <div class="nav-links">
-                <a href="pages/cadastro-clientes.html" class="nav-link">
-                    <i class="fas fa-user-plus"></i> Cadastro
-                </a>
-                <a href="pages/participar.html" class="nav-link">
-                    <i class="fas fa-play"></i> Participar
-                </a>
-                <a href="pages/ranking.html" class="nav-link">
-                    <i class="fas fa-trophy"></i> Ranking
-                </a>
-                <a href="pages/ranking-ganhadores.html" class="nav-link">
-                    <i class="fas fa-crown"></i> Ganhadores
-                </a>
-                <a href="index.html" class="nav-link active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-            </div>
+    <div class="redirect-container">
+        <div class="logo">
+            <i class="fas fa-trophy"></i>
         </div>
-    </nav>
-
-    <div class="container">
-        <!-- Header Section -->
-        <header class="header">
-            <div class="header-content">
-                <div class="header-text">
-                    <h1>Dashboard Administrador</h1>
-                    <p>Gere palavras-chave e disponibilize na live!</p>
-                    <p>Visualize os últimos clientes cadastrados.</p>
+        
+        <h1>ClientKey</h1>
+        <p>Sistema de Ranking de Prêmios</p>
+        
+        <div class="options">
+            <a href="client/cadastro.html" class="option-btn">
+                <div class="option-icon">
+                    <i class="fas fa-user-plus"></i>
                 </div>
-                <div class="header-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <span class="stat-number" id="totalClients">0</span>
-                            <span class="stat-label">Clientes</span>
-                        </div>
-                    </div>
+                <div class="option-content">
+                    <h3>Área do Cliente</h3>
+                    <p>Cadastre-se e participe do ranking</p>
                 </div>
-            </div>
-        </header>
-
-        <div class="main-content">
-
-            <!-- Keywords Status -->
-            <section class="keywords-section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-eye"></i>Gerador de Palavras-Chave</h2>
-                        <p>Gere a palavra-chave que será disponibilizada na próxima Live</p>
-                    </div>
-                    <div class="keywords-config">
-                        <div id="currentKeywordDisplay" class="current-keyword-display">
-                            <div class="no-keyword">
-                                <i class="fas fa-clock"></i>
-                                <p>Nenhuma palavra ativa no momento</p>
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn-primary" onclick="generateNewKeywords()">
-                                <i class="fas fa-random"></i> Gerar Nova Palavra
-                            </button>
-                            <button type="button" class="btn-secondary" onclick="clearKeywords()">
-                                <i class="fas fa-times"></i> Limpar
-                            </button>
-                            <button type="button" class="btn-action btn-danger" onclick="clearAllAttempts()">
-                                <i class="fas fa-trash"></i> Limpar Tentativas
-                            </button>
-                        </div>
-                        
-                        <div id="keywordPreview" class="keyword-preview" style="display: none;">
-                            <h4>Como aparece para os clientes:</h4>
-                            <div class="preview-buttons" id="previewButtons"></div>
-                        </div>
-                        
-                        <div id="keywordStatus" class="keyword-status"></div>
-                    </div>
+            </a>
+            
+            <a href="#" class="option-btn admin-option" onclick="redirectToAdmin()">
+                <div class="option-icon">
+                    <i class="fas fa-shield-alt"></i>
                 </div>
-            </section>
-
-            <!-- Clients List -->
-            <section class="clients-section">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="header-actions">
-                            <h2><i class="fas fa-list"></i> Últimos Clientes Cadastrados</h2>
-                            <div class="actions">
-                                <a href="pages/cadastro-clientes.html" class="btn-action">
-                                    <i class="fas fa-user-plus"></i> Cadastrar Clientes
-                                </a>
-                                <button class="btn-action" onclick="exportClients()">
-                                    <i class="fas fa-download"></i> Exportar
-                                </button>
-                                <button class="btn-action btn-danger" onclick="clearAllClients()">
-                                    <i class="fas fa-trash"></i> Limpar Todos
-                                </button>
-                            </div>
-                        </div>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="searchInput" placeholder="Buscar por nome ou e-mail..." onkeyup="filterClients()">
-                        </div>
-                    </div>
-                    
-                    <div class="clients-list" id="clientsList">
-                        <div class="empty-state">
-                            <i class="fas fa-user-friends"></i>
-                            <h3>Nenhum cliente cadastrado</h3>
-                            <p>Os clientes serão exibidos aqui conforme forem se cadastrando</p>
-                        </div>
-                    </div>
+                <div class="option-content">
+                    <h3>Área Administrativa</h3>
+                    <p>Painel de controle do sistema</p>
                 </div>
-            </section>
-
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <div class="card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-bolt"></i> Ações Rápidas</h2>
-                    </div>
-                    <div class="actions-grid">
-                        <button class="action-btn" onclick="generateReport()">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Gerar Relatório</span>
-                        </button>
-                        <button class="action-btn" onclick="exportClients()">
-                            <i class="fas fa-download"></i>
-                            <span>Exportar Clientes</span>
-                        </button>
-                        <button class="action-btn" onclick="backupData()">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Backup dos Dados</span>
-                        </button>
-                        <button class="action-btn" onclick="goToRanking()">
-                            <i class="fas fa-trophy"></i>
-                            <span>Ver Ranking</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
+            </a>
+        </div>
+        
+        <div class="loading" id="loadingMessage">
+            <div class="spinner"></div>
+            <span>Redirecionando...</span>
+        </div>
+        
+        <div class="redirect-info">
+            <i class="fas fa-info-circle"></i>
+            Escolha a área que deseja acessar
         </div>
     </div>
-
-
-    <!-- Success/Error Messages -->
-    <div id="messageContainer" class="message-container"></div>
     
-    <!-- Firebase Status -->
-    <div id="firebaseStatus" class="firebase-status">
-        <i class="fas fa-cloud"></i> Conectado ao Firebase
-    </div>
-
-    <!-- Firebase Configuration -->
-    <script type="module" src="firebase-config.js"></script>
-    <script src="assets/js/dashboard.js"></script>
+    <!-- Scripts de Autenticação -->
+    <script src="auth/AuthService.js"></script>
+    
+    <script>
+        // Verificar se há redirecionamento automático baseado na URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const area = urlParams.get('area');
+            
+            if (area === 'admin') {
+                redirectToAdmin();
+            } else if (area === 'client') {
+                window.location.href = 'client/cadastro.html';
+            }
+        });
+        
+        function redirectToAdmin() {
+            // Mostrar loading
+            document.getElementById('loadingMessage').classList.add('show');
+            
+            // Verificar se já está autenticado
+            if (authService.isAuthenticated()) {
+                // Já autenticado, ir direto para dashboard
+                setTimeout(() => {
+                    window.location.href = 'admin/dashboard.html';
+                }, 1000);
+            } else {
+                // Não autenticado, ir para login
+                setTimeout(() => {
+                    window.location.href = 'auth/login.html?return=' + encodeURIComponent('/admin/dashboard.html');
+                }, 1000);
+            }
+        }
+    </script>
 </body>
 </html>

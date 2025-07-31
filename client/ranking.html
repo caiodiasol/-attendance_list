@@ -7,6 +7,107 @@
     <link rel="stylesheet" href="../assets/css/ranking.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Menu Hambúrguer */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger-menu:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background-color: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-6px, -6px);
+        }
+
+        /* Dropdown menu móvel */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-nav-item:hover {
+            background-color: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .mobile-nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .header-container {
+                position: relative;
+            }
+
+            .stats-mini {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -18,7 +119,7 @@
                     <span class="logo-text">Live Ranking</span>
                 </div>
                 <nav class="main-nav">
-                    <a href="cadastro-clientes.html" class="nav-item">
+                    <a href="cadastro.html" class="nav-item">
                         <i class="fas fa-user-plus"></i>
                         <span>Cadastro</span>
                     </a>
@@ -47,7 +148,30 @@
                         <span class="stat-label">Participantes</span>
                     </div>
                 </div>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
             </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="cadastro.html" class="mobile-nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Cadastro</span>
+            </a>
+            <a href="participar.html" class="mobile-nav-item">
+                <i class="fas fa-play"></i>
+                <span>Participar</span>
+            </a>
+            <a href="ranking.html" class="mobile-nav-item active">
+                <i class="fas fa-trophy"></i>
+                <span>Ranking</span>
+            </a>
+            <a href="ranking-ganhadores.html" class="mobile-nav-item">
+                <i class="fas fa-crown"></i>
+                <span>Ganhadores</span>
+            </a>
         </div>
     </header>
 
@@ -171,5 +295,33 @@
     <!-- Firebase Configuration -->
     <script type="module" src="../firebase-config.js"></script>
     <script src="../assets/js/ranking.js"></script>
+    
+    <script>
+        // Menu hambúrguer
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Inicializar menu hambúrguer quando o DOM carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHamburgerMenu();
+        });
+    </script>
 </body>
 </html>

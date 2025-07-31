@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - ClientKey</title>
+    <link rel="stylesheet" href="../assets/css/modern-theme.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos específicos para o painel administrativo */
+        .admin-navbar {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .admin-navbar .nav-brand {
+            color: #ecf0f1;
+        }
+        
+        .admin-navbar .nav-brand i {
+            color: #3498db;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 20px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .user-details {
+            color: #ecf0f1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #7f8c8d;
+            line-height: 1;
+        }
+        
+        .close:hover {
+            color: #e74c3c;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .admin-stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .admin-stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .admin-stat-card h3 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .admin-stat-card .stat-change {
+            font-size: 14px;
+            color: #27ae60;
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-action-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            border-color: #3498db;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .quick-action-card i {
+            font-size: 36px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .quick-action-card h4 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-action-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .activity-log {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .activity-log h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .activity-icon.login {
+            background: #27ae60;
+        }
+        
+        .activity-icon.logout {
+            background: #e74c3c;
+        }
+        
+        .activity-icon.action {
+            background: #3498db;
+        }
+        
+        .activity-details h4 {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .activity-details p {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .activity-time {
+            margin-left: auto;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+        
+        .permission-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin: 2px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .role-badge.super_admin {
+            background: #8e44ad;
+        }
+        
+        .role-badge.moderator {
+            background: #f39c12;
+        }
+        
+        /* Estilos para seção de palavras-chave administrativas */
+        .keywords-admin-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .no-keywords-admin {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .no-keywords-admin i {
+            font-size: 48px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+        
+        .no-keywords-admin p {
+            margin: 10px 0;
+        }
+        
+        .no-keywords-admin .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .keywords-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .keyword-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .keyword-info h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .current-word {
+            font-size: 32px;
+            font-weight: 700;
+            color: #27ae60;
+            background: #e8f5e8;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #c8e6c9;
+        }
+        
+        .keyword-details {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .keyword-details span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .keywords-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .keywords-preview h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .preview-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .preview-option {
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-option.correct {
+            background: #e8f5e8;
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        .preview-option.incorrect {
+            background: #f8f9fa;
+            border-color: #e1e8ed;
+            color: #7f8c8d;
+        }
+        
+        .keywords-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-generate,
+        .btn-clear,
+        .btn-attempts {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-generate {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-generate:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-attempts {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-attempts:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .keyword-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .keywords-display {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .keywords-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-generate,
+            .btn-clear,
+            .btn-attempts {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Administrativa -->
+    <nav class="navbar admin-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>Painel Administrativo</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users"></i> Usuários
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Relatórios
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Carregando...</div>
+                    <div class="user-role" id="userRole"></div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Dashboard Administrativo</h1>
+                    <p>Visão geral do sistema e controles administrativos</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Estatísticas Administrativas -->
+            <section class="admin-stats">
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-users"></i> Total de Clientes</h3>
+                    <div class="stat-value" id="totalClients">0</div>
+                    <div class="stat-change">+12% este mês</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-user-shield"></i> Administradores</h3>
+                    <div class="stat-value" id="totalAdmins">0</div>
+                    <div class="stat-change">2 ativos</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-key"></i> Palavras-chave Ativas</h3>
+                    <div class="stat-value" id="activeKeywords">0</div>
+                    <div class="stat-change">Última atualização hoje</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-chart-line"></i> Atividades Hoje</h3>
+                    <div class="stat-value" id="todayActivities">0</div>
+                    <div class="stat-change">+8% vs ontem</div>
+                </div>
+            </section>
+
+            <!-- Seção de Palavras-chave -->
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-key"></i> Gerador de Palavras-chave</h2>
+                    <p>Gere e gerencie as palavras-chave para as lives</p>
+                </div>
+                
+                <div class="keywords-admin-container">
+                    <div class="current-keywords" id="currentKeywordsAdmin">
+                        <div class="no-keywords-admin" id="noKeywordsAdmin">
+                            <i class="fas fa-clock"></i>
+                            <p>Nenhuma palavra-chave ativa no momento</p>
+                            <p class="subtitle">Clique em "Gerar Nova Palavra" para começar</p>
+                        </div>
+                        
+                        <div class="keywords-display" id="keywordsDisplay" style="display: none;">
+                            <div class="keyword-info">
+                                <h4>Palavra-chave Atual</h4>
+                                <div class="current-word" id="currentWord">-</div>
+                                <p class="keyword-details">
+                                    <span>Criada em: <span id="keywordCreatedAt">-</span></span>
+                                    <span>ID: <span id="keywordId">-</span></span>
+                                </p>
+                            </div>
+                            
+                            <div class="keywords-preview">
+                                <h4>Como aparece para os clientes:</h4>
+                                <div class="preview-options" id="previewOptions">
+                                    <!-- Opções serão inseridas aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="keywords-actions">
+                        <button class="btn-generate" onclick="generateNewKeywords()">
+                            <i class="fas fa-random"></i> Gerar Nova Palavra
+                        </button>
+                        <button class="btn-clear" onclick="clearKeywords()">
+                            <i class="fas fa-times"></i> Limpar Palavras
+                        </button>
+                        <button class="btn-attempts" onclick="clearAllAttempts()">
+                            <i class="fas fa-trash-alt"></i> Limpar Tentativas
+                        </button>
+                    </div>
+                    
+                    <div class="keyword-stats" id="keywordStats" style="display: none;">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalAttempts">0</div>
+                                <div class="stat-label">Tentativas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="correctAttempts">0</div>
+                                <div class="stat-label">Acertos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="accuracyRate">0%</div>
+                                <div class="stat-label">Taxa de Acerto</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ações Rápidas -->
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bolt"></i> Ações Rápidas</h2>
+                </div>
+                <div class="quick-actions-grid">
+                    <div class="quick-action-card" onclick="manageUsers()">
+                        <i class="fas fa-users-cog"></i>
+                        <h4>Gerenciar Usuários</h4>
+                        <p>Adicionar, editar ou remover usuários</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="viewReports()">
+                        <i class="fas fa-chart-bar"></i>
+                        <h4>Relatórios</h4>
+                        <p>Visualizar estatísticas detalhadas</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="exportClients()">
+                        <i class="fas fa-download"></i>
+                        <h4>Exportar Clientes</h4>
+                        <p>Baixar lista de clientes (Email, Nome, Telefone)</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="showReportsDialog()">
+                        <i class="fas fa-file-pdf"></i>
+                        <h4>Relatórios PDF</h4>
+                        <p>Gerar relatório de ranking por período</p>
+                    </div>
+                    
+                    
+                    <div class="quick-action-card" onclick="viewAuditLogs()">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h4>Logs de Auditoria</h4>
+                        <p>Visualizar atividades do sistema</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="manageClients()">
+                        <i class="fas fa-users"></i>
+                        <h4>Gerenciar Clientes</h4>
+                        <p>Visualizar e gerenciar clientes cadastrados</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Log de Atividades -->
+            <section class="activity-log">
+                <h3><i class="fas fa-history"></i> Atividades Recentes</h3>
+                <div id="activityList">
+                    <div class="activity-item">
+                        <div class="activity-icon login">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Login realizado</h4>
+                            <p>Usuário admin fez login no sistema</p>
+                        </div>
+                        <div class="activity-time">Agora</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Informações do Sistema -->
+            <section class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-info-circle"></i> Informações do Sistema</h2>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4>Usuário Atual</h4>
+                        <p><strong>Nome:</strong> <span id="currentUserName">-</span></p>
+                        <p><strong>Role:</strong> <span id="currentUserRole" class="role-badge">-</span></p>
+                        <p><strong>Permissões:</strong></p>
+                        <div id="currentUserPermissions"></div>
+                        <p><strong>Último Login:</strong> <span id="currentUserLastLogin">-</span></p>
+                    </div>
+                    
+                    <div>
+                        <h4>Status do Sistema</h4>
+                        <p><strong>Database:</strong> <span id="dbStatus">Verificando...</span></p>
+                        <p><strong>Uptime:</strong> <span id="systemUptime">-</span></p>
+                        <p><strong>Última Atualização:</strong> <span id="lastUpdate">-</span></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal para Relatórios PDF -->
+    <div id="reportsModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-pdf"></i> Gerar Relatório PDF</h2>
+                <span class="close" onclick="closeReportsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="startDate">Data Inicial:</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Data Final:</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="reportType">Tipo de Relatório:</label>
+                    <select id="reportType" name="reportType">
+                        <option value="ranking">Ranking por Pontuação</option>
+                        <option value="activities">Atividades por Período</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeReportsModal()">Cancelar</button>
+                    <button type="button" class="btn-primary" onclick="generatePDFReport()">
+                        <i class="fas fa-file-pdf"></i> Gerar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Scripts de Autenticação -->
+    <script src="../auth/AuthService.js"></script>
+    <script src="../auth/RouteGuard.js"></script>
+    
+    <!-- Database System Scripts -->
+    <script src="../database/connection.js"></script>
+    <script src="../database/models/Client.js"></script>
+    <script src="../database/models/Activity.js"></script>
+    <script src="../database/models/Keyword.js"></script>
+    <script src="../database/services/DatabaseService.js"></script>
+    <script src="../database/services/AuditService.js"></script>
+    <script src="../database/services/ErrorHandler.js"></script>
+    <script src="../database/migration/DataMigration.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="../firebase-config.js"></script>
+    
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let dashboardInitialized = false;
+        
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando dashboard administrativo...');
+            
+            // Verificar autenticação
+            if (!authService.isAuthenticated()) {
+                console.log('❌ Usuário não autenticado, redirecionando...');
+                authService.redirectToLogin();
+                return;
+            }
+            
+            // Verificar permissão para dashboard
+            if (!authService.hasPermission('view_dashboard') && !authService.hasPermission('all')) {
+                console.log('❌ Usuário sem permissão para dashboard');
+                authService.showAccessDenied();
+                return;
+            }
+            
+            // Inicializar DatabaseService globalmente
+            try {
+                if (typeof DatabaseService !== 'undefined') {
+                    console.log('🔄 Inicializando DatabaseService...');
+                    window.DatabaseService = new DatabaseService();
+                    const initialized = await window.DatabaseService.initialize();
+                    
+                    if (initialized) {
+                        console.log('✅ DatabaseService inicializado com sucesso');
+                    } else {
+                        console.log('⚠️ DatabaseService inicializado com limitações');
+                    }
+                } else {
+                    console.log('❌ DatabaseService não encontrado');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao inicializar DatabaseService:', error);
+            }
+            
+            // Inicializar interface
+            await initializeDashboard();
+        });
+        
+        /**
+         * Inicializar dashboard
+         */
+        async function initializeDashboard() {
+            try {
+                // Carregar informações do usuário
+                loadUserInfo();
+                
+                // Carregar estatísticas
+                await loadStatistics();
+                
+                // Carregar atividades recentes
+                loadRecentActivities();
+                
+                // Carregar status do sistema
+                loadSystemStatus();
+                
+                // Carregar palavras-chave existentes
+                setTimeout(() => {
+                    loadExistingKeywords();
+                }, 2000); // Aguardar sistema estar totalmente carregado
+                
+                // Configurar atualizações automáticas
+                setupAutoRefresh();
+                
+                dashboardInitialized = true;
+                console.log('✅ Dashboard inicializado com sucesso');
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar dashboard:', error);
+                showMessage('Erro ao carregar dashboard', 'error');
+            }
+        }
+        
+        /**
+         * Carregar informações do usuário atual
+         */
+        function loadUserInfo() {
+            const user = authService.getCurrentUser();
+            if (user) {
+                // Avatar
+                const avatar = document.getElementById('userAvatar');
+                avatar.textContent = user.username.charAt(0).toUpperCase();
+                
+                // Nome e role na navbar
+                document.getElementById('userName').textContent = user.username;
+                document.getElementById('userRole').textContent = user.role.replace('_', ' ').toUpperCase();
+                
+                // Informações detalhadas
+                document.getElementById('currentUserName').textContent = user.username;
+                
+                const roleElement = document.getElementById('currentUserRole');
+                roleElement.textContent = user.role.replace('_', ' ').toUpperCase();
+                roleElement.className = `role-badge ${user.role}`;
+                
+                // Permissões
+                const permissionsContainer = document.getElementById('currentUserPermissions');
+                permissionsContainer.innerHTML = '';
+                
+                user.permissions.forEach(permission => {
+                    const badge = document.createElement('span');
+                    badge.className = 'permission-badge';
+                    badge.textContent = permission;
+                    permissionsContainer.appendChild(badge);
+                });
+                
+                // Último login
+                if (user.loginTime) {
+                    const loginTime = new Date(user.loginTime);
+                    document.getElementById('currentUserLastLogin').textContent = 
+                        loginTime.toLocaleString('pt-BR');
+                }
+            }
+        }
+        
+        /**
+         * Carregar estatísticas
+         */
+        async function loadStatistics() {
+            try {
+                // Total de clientes
+                if (window.FirebaseDB) {
+                    const clients = await window.FirebaseDB.getClients();
+                    document.getElementById('totalClients').textContent = clients.length;
+                }
+                
+                // Total de administradores
+                const adminUsers = authService.getAdminUsers();
+                const activeAdmins = adminUsers.filter(user => user.active).length;
+                document.getElementById('totalAdmins').textContent = activeAdmins;
+                
+                // Palavras-chave ativas
+                if (window.FirebaseDB) {
+                    const keywords = window.FirebaseDB.getCurrentKeywords();
+                    document.getElementById('activeKeywords').textContent = keywords ? 1 : 0;
+                }
+                
+                // Atividades hoje
+                if (window.FirebaseDB) {
+                    const activities = await window.FirebaseDB.getAllActivities(100);
+                    const today = new Date().toDateString();
+                    const todayActivities = activities.filter(activity => 
+                        new Date(activity.timestamp).toDateString() === today
+                    );
+                    document.getElementById('todayActivities').textContent = todayActivities.length;
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar estatísticas:', error);
+            }
+        }
+        
+        /**
+         * Carregar atividades recentes
+         */
+        function loadRecentActivities() {
+            try {
+                const logs = authService.getActivityLogs({ limit: 10 });
+                const activityList = document.getElementById('activityList');
+                activityList.innerHTML = '';
+                
+                if (logs.length === 0) {
+                    activityList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Nenhuma atividade recente</p>';
+                    return;
+                }
+                
+                logs.forEach(log => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    
+                    const iconClass = getActivityIcon(log.action);
+                    const actionText = getActivityText(log.action, log.details);
+                    const timeText = formatTime(log.timestamp);
+                    
+                    activityItem.innerHTML = `
+                        <div class="activity-icon ${iconClass.type}">
+                            <i class="${iconClass.icon}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>${actionText.title}</h4>
+                            <p>${actionText.description}</p>
+                        </div>
+                        <div class="activity-time">${timeText}</div>
+                    `;
+                    
+                    activityList.appendChild(activityItem);
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar atividades:', error);
+            }
+        }
+        
+        /**
+         * Carregar status do sistema
+         */
+        async function loadSystemStatus() {
+            try {
+                // Status do banco de dados
+                if (window.databaseService) {
+                    const health = await window.databaseService.healthCheck();
+                    const dbStatusElement = document.getElementById('dbStatus');
+                    dbStatusElement.textContent = `${health.provider} (${health.status})`;
+                    dbStatusElement.style.color = health.status === 'available' ? '#27ae60' : '#e74c3c';
+                }
+                
+                
+                // Uptime (simulado)
+                const startTime = localStorage.getItem('system_start_time') || Date.now();
+                localStorage.setItem('system_start_time', startTime);
+                const uptime = Date.now() - parseInt(startTime);
+                document.getElementById('systemUptime').textContent = formatUptime(uptime);
+                
+                // Última atualização
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar status do sistema:', error);
+            }
+        }
+        
+        /**
+         * Configurar atualização automática
+         */
+        function setupAutoRefresh() {
+            // Atualizar a cada 30 segundos
+            setInterval(async () => {
+                if (dashboardInitialized && authService.isAuthenticated()) {
+                    await loadStatistics();
+                    loadRecentActivities();
+                    loadSystemStatus();
+                }
+            }, 30000);
+        }
+        
+        /**
+         * Utilitários para atividades
+         */
+        function getActivityIcon(action) {
+            const icons = {
+                'login_success': { icon: 'fas fa-sign-in-alt', type: 'login' },
+                'login_failed': { icon: 'fas fa-exclamation-triangle', type: 'logout' },
+                'logout': { icon: 'fas fa-sign-out-alt', type: 'logout' },
+                'user_created': { icon: 'fas fa-user-plus', type: 'action' },
+                'user_updated': { icon: 'fas fa-user-edit', type: 'action' },
+                'user_deleted': { icon: 'fas fa-user-minus', type: 'logout' },
+                'data_exported': { icon: 'fas fa-download', type: 'action' }
+            };
+            
+            return icons[action] || { icon: 'fas fa-info-circle', type: 'action' };
+        }
+        
+        function getActivityText(action, details) {
+            const texts = {
+                'login_success': {
+                    title: 'Login realizado',
+                    description: `Usuário ${details.username || 'desconhecido'} fez login`
+                },
+                'login_failed': {
+                    title: 'Tentativa de login falhou',
+                    description: `Tentativa com usuário ${details.username || 'desconhecido'}`
+                },
+                'logout': {
+                    title: 'Logout realizado',
+                    description: `Usuário ${details.username || 'desconhecido'} saiu do sistema`
+                },
+                'user_created': {
+                    title: 'Usuário criado',
+                    description: `Novo usuário ${details.username || 'desconhecido'} foi criado`
+                }
+            };
+            
+            return texts[action] || {
+                title: 'Atividade do sistema',
+                description: `Ação: ${action}`
+            };
+        }
+        
+        function formatTime(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diff = now - time;
+            
+            if (diff < 60000) return 'Agora';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m atrás`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h atrás`;
+            
+            return time.toLocaleDateString('pt-BR');
+        }
+        
+        function formatUptime(uptime) {
+            const hours = Math.floor(uptime / 3600000);
+            const minutes = Math.floor((uptime % 3600000) / 60000);
+            
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days}d ${hours % 24}h`;
+            }
+            
+            return `${hours}h ${minutes}m`;
+        }
+        
+        /**
+         * Ações rápidas
+         */
+        function manageUsers() {
+            if (authService.hasPermission('manage_users') || authService.hasPermission('all')) {
+                window.location.href = 'users.html';
+            } else {
+                showMessage('Você não tem permissão para gerenciar usuários', 'error');
+            }
+        }
+        
+        function manageClients() {
+            window.location.href = 'clients.html'; // Página para gerenciar clientes
+        }
+        
+        /**
+         * Funcionalidades de palavras-chave
+         */
+        function generateNewKeywords() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar palavras-chave', 'error');
+                    return;
+                }
+                
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco ainda não carregado', 'error');
+                    return;
+                }
+                
+                showMessage('Gerando nova palavra-chave...', 'info');
+                
+                // Gerar nova palavra-chave
+                const keywordData = window.FirebaseDB.generateNewKeywords();
+                
+                if (keywordData) {
+                    displayKeywords(keywordData);
+                    showMessage('Nova palavra-chave gerada com sucesso!', 'success');
+                    
+                    // Log da atividade
+                    authService.logActivity('keywords_generated', {
+                        keywordId: keywordData.id,
+                        correctKeyword: keywordData.correct,
+                        incorrectKeywords: keywordData.incorrect
+                    });
+                } else {
+                    showMessage('Erro ao gerar palavra-chave', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar palavras-chave:', error);
+                showMessage('Erro ao gerar palavras-chave: ' + error.message, 'error');
+            }
+        }
+        
+        function clearKeywords() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar palavras-chave', 'error');
+                    return;
+                }
+                
+                if (confirm('Deseja realmente limpar as palavras-chave atuais?\n\nIsso impedirá novos participantes de responder.')) {
+                    if (typeof window.FirebaseDB !== 'undefined') {
+                        window.FirebaseDB.clearCurrentKeywords();
+                        hideKeywords();
+                        showMessage('Palavras-chave limpas com sucesso!', 'success');
+                        
+                        // Log da atividade
+                        authService.logActivity('keywords_cleared', {
+                            clearedBy: authService.getCurrentUser()?.username
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao limpar palavras-chave:', error);
+                showMessage('Erro ao limpar palavras-chave', 'error');
+            }
+        }
+        
+        function clearAllAttempts() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar tentativas', 'error');
+                    return;
+                }
+                
+                if (confirm('Deseja realmente limpar todas as tentativas?\n\nIsso permitirá que os usuários participem novamente da palavra-chave atual.')) {
+                    if (typeof window.FirebaseDB !== 'undefined') {
+                        window.FirebaseDB.clearUserAttempts();
+                        updateKeywordStats(); // Atualizar estatísticas
+                        showMessage('Tentativas limpas com sucesso!', 'success');
+                        
+                        // Log da atividade
+                        authService.logActivity('attempts_cleared', {
+                            clearedBy: authService.getCurrentUser()?.username
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao limpar tentativas:', error);
+                showMessage('Erro ao limpar tentativas', 'error');
+            }
+        }
+        
+        /**
+         * Exibir palavras-chave na interface administrativa
+         */
+        function displayKeywords(keywordData) {
+            const noKeywords = document.getElementById('noKeywordsAdmin');
+            const keywordsDisplay = document.getElementById('keywordsDisplay');
+            
+            // Esconder mensagem de "sem palavras"
+            noKeywords.style.display = 'none';
+            keywordsDisplay.style.display = 'grid';
+            
+            // Atualizar informações da palavra atual
+            document.getElementById('currentWord').textContent = keywordData.correct;
+            document.getElementById('keywordCreatedAt').textContent = 
+                new Date(keywordData.timestamp).toLocaleString('pt-BR');
+            document.getElementById('keywordId').textContent = keywordData.id;
+            
+            // Criar preview das opções para clientes
+            const previewOptions = document.getElementById('previewOptions');
+            const allOptions = [keywordData.correct, ...keywordData.incorrect];
+            const shuffledOptions = shuffleArray([...allOptions]);
+            
+            previewOptions.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = `preview-option ${option === keywordData.correct ? 'correct' : 'incorrect'}`;
+                optionDiv.textContent = option;
+                previewOptions.appendChild(optionDiv);
+            });
+            
+            // Mostrar e atualizar estatísticas
+            updateKeywordStats();
+            document.getElementById('keywordStats').style.display = 'block';
+        }
+        
+        /**
+         * Esconder palavras-chave
+         */
+        function hideKeywords() {
+            const noKeywords = document.getElementById('noKeywordsAdmin');
+            const keywordsDisplay = document.getElementById('keywordsDisplay');
+            const keywordStats = document.getElementById('keywordStats');
+            
+            noKeywords.style.display = 'block';
+            keywordsDisplay.style.display = 'none';
+            keywordStats.style.display = 'none';
+        }
+        
+        /**
+         * Atualizar estatísticas das palavras-chave
+         */
+        function updateKeywordStats() {
+            try {
+                if (typeof window.FirebaseDB === 'undefined') return;
+                
+                const currentKeywords = window.FirebaseDB.getCurrentKeywords();
+                if (!currentKeywords) return;
+                
+                // Simular estatísticas (em um sistema real, você buscaria do banco)
+                const attempts = JSON.parse(localStorage.getItem('user-attempts') || '{}');
+                const keywordAttempts = Object.values(attempts).filter(attempt => 
+                    attempt.keywordId === currentKeywords.id
+                );
+                
+                const totalAttempts = keywordAttempts.length;
+                const correctAttempts = keywordAttempts.filter(attempt => attempt.isCorrect).length;
+                const accuracyRate = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+                
+                document.getElementById('totalAttempts').textContent = totalAttempts;
+                document.getElementById('correctAttempts').textContent = correctAttempts;
+                document.getElementById('accuracyRate').textContent = accuracyRate + '%';
+                
+            } catch (error) {
+                console.error('❌ Erro ao atualizar estatísticas:', error);
+            }
+        }
+        
+        /**
+         * Carregar palavras-chave existentes na inicialização
+         */
+        async function loadExistingKeywords() {
+            try {
+                // Inicializar DatabaseService se ainda não estiver
+                if (typeof window.DatabaseService === 'undefined') {
+                    console.log('🔄 DatabaseService não encontrado, inicializando...');
+                    window.DatabaseService = new DatabaseService();
+                    await window.DatabaseService.initialize();
+                }
+                
+                // Verificar se está disponível e carregar palavras-chave
+                if (window.DatabaseService.isAvailable()) {
+                    console.log('🔑 Carregando palavras-chave do banco...');
+                    const result = await window.DatabaseService.getCurrentKeywords();
+                    
+                    if (result.success && result.data) {
+                        const keywordData = {
+                            id: result.data.id,
+                            correct: result.data.correct_word,
+                            incorrect: JSON.parse(result.data.incorrect_words),
+                            timestamp: result.data.created_at
+                        };
+                        displayKeywords(keywordData);
+                        console.log('✅ Palavras-chave carregadas do banco');
+                    } else {
+                        console.log('📭 Nenhuma palavra-chave ativa no banco');
+                    }
+                } else {
+                    console.log('⚠️ DatabaseService não disponível, tentando localStorage...');
+                    // Fallback para localStorage
+                    const saved = localStorage.getItem('currentKeywords');
+                    if (saved) {
+                        const currentKeywords = JSON.parse(saved);
+                        displayKeywords(currentKeywords);
+                        console.log('✅ Palavras-chave carregadas do localStorage');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar palavras-chave:', error);
+                // Mostrar mensagem de erro apenas se for crítico
+                if (error.message.includes('critical')) {
+                    showMessage('Erro crítico ao carregar palavras-chave', 'error');
+                }
+            }
+        }
+        
+        function viewReports() {
+            if (authService.hasPermission('view_reports') || authService.hasPermission('all')) {
+                window.location.href = 'reports.html';
+            } else {
+                showMessage('Você não tem permissão para visualizar relatórios', 'error');
+            }
+        }
+        
+        // Função para exportar clientes (CSV)
+        async function exportClients() {
+            try {
+                if (!authService.hasPermission('export_data') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para exportar dados', 'error');
+                    return;
+                }
+                
+                showMessage('Iniciando exportação de clientes...', 'info');
+                
+                const clients = await window.FirebaseDB.getClients();
+                
+                // Cabeçalho CSV
+                let csvContent = 'Email,Nome,Telefone\n';
+                
+                // Dados dos clientes
+                clients.forEach(client => {
+                    const email = (client.email || '').replace(/"/g, '""');
+                    const name = (client.name || '').replace(/"/g, '""');
+                    const phone = (client.whatsapp || client.phone || '').replace(/"/g, '""');
+                    
+                    csvContent += `"${email}","${name}","${phone}"\n`;
+                });
+                
+                // Criar e baixar arquivo
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                
+                showMessage(`${clients.length} clientes exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao exportar clientes:', error);
+                showMessage('Erro ao exportar clientes', 'error');
+            }
+        }
+        
+        // Função para mostrar modal de relatórios
+        function showReportsDialog() {
+            if (!authService.hasPermission('view_reports') && !authService.hasPermission('all')) {
+                showMessage('Você não tem permissão para gerar relatórios', 'error');
+                return;
+            }
+            
+            // Definir datas padrão (último mês)
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            
+            document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            
+            document.getElementById('reportsModal').style.display = 'flex';
+        }
+        
+        // Função para fechar modal de relatórios
+        function closeReportsModal() {
+            document.getElementById('reportsModal').style.display = 'none';
+        }
+        
+        // Função para gerar relatório PDF
+        async function generatePDFReport() {
+            try {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const reportType = document.getElementById('reportType').value;
+                
+                if (!startDate || !endDate) {
+                    showMessage('Por favor, selecione as datas inicial e final', 'error');
+                    return;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    showMessage('A data inicial deve ser anterior à data final', 'error');
+                    return;
+                }
+                
+                showMessage('Gerando relatório PDF...', 'info');
+                
+                // Obter dados do período
+                const clients = await window.FirebaseDB.getClients();
+                const activities = await window.FirebaseDB.getAllActivities();
+                
+                // Filtrar atividades por período
+                const filteredActivities = activities.filter(activity => {
+                    const activityDate = new Date(activity.timestamp);
+                    return activityDate >= new Date(startDate) && activityDate <= new Date(endDate + 'T23:59:59');
+                });
+                
+                if (reportType === 'ranking') {
+                    await generateRankingPDF(clients, filteredActivities, startDate, endDate);
+                } else {
+                    await generateActivitiesPDF(filteredActivities, startDate, endDate);
+                }
+                
+                closeReportsModal();
+                showMessage('Relatório PDF gerado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar relatório:', error);
+                showMessage('Erro ao gerar relatório: ' + error.message, 'error');
+            }
+        }
+        
+        // Função para gerar PDF de ranking
+        async function generateRankingPDF(clients, activities, startDate, endDate) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            console.log('🎯 Gerando PDF de ranking...');
+            
+            // Configurar fonte
+            doc.setFont('helvetica');
+            
+            // Título
+            doc.setFontSize(20);
+            doc.setTextColor(44, 62, 80);
+            doc.text('Relatório de Ranking - ClientKey', 20, 25);
+            
+            // Período
+            doc.setFontSize(12);
+            doc.setTextColor(127, 140, 141);
+            doc.text(`Período: ${formatDate(startDate)} até ${formatDate(endDate)}`, 20, 35);
+            doc.text(`Gerado em: ${formatDate(new Date().toISOString().split('T')[0])}`, 20, 42);
+            
+            // Calcular ranking
+            const ranking = calculateRanking(clients, activities);
+            console.log('📋 Ranking calculado:', ranking);
+            
+            // Linha separadora
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, 50, 190, 50);
+            
+            let yPos = 60;
+            
+            if (ranking.length === 0) {
+                // Caso não haja dados
+                doc.setFontSize(14);
+                doc.setTextColor(127, 140, 141);
+                doc.text('Nenhum participante com pontuação no período selecionado.', 20, yPos);
+                yPos += 20;
+                
+                doc.setFontSize(12);
+                doc.text('Possíveis motivos:', 20, yPos);
+                yPos += 10;
+                doc.text('• Não há atividades registradas no período', 25, yPos);
+                yPos += 7;
+                doc.text('• Nenhuma atividade pontuou no período', 25, yPos);
+                yPos += 7;
+                doc.text('• Problemas na correspondência entre clientes e atividades', 25, yPos);
+                
+            } else {
+                // Cabeçalho da tabela
+                doc.setFontSize(12);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Pos', 25, yPos);
+                doc.text('Nome', 40, yPos);
+                doc.text('Email', 100, yPos);
+                doc.text('Pontos', 160, yPos);
+                
+                // Linha do cabeçalho
+                doc.line(20, yPos + 3, 190, yPos + 3);
+                yPos += 13;
+                
+                // Dados do ranking
+                doc.setFont('helvetica', 'normal');
+                
+                ranking.slice(0, 20).forEach((item, index) => {
+                    // Alternar cor de fundo
+                    if (index % 2 === 0) {
+                        doc.setFillColor(248, 249, 250);
+                        doc.rect(20, yPos - 6, 170, 8, 'F');
+                    }
+                    
+                    // Posição
+                    doc.setTextColor(52, 152, 219);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${index + 1}º`, 25, yPos);
+                    
+                    // Nome (truncar se muito longo)
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', 'normal');
+                    const name = (item.name || 'Nome não informado').toString();
+                    const truncatedName = name.length > 25 ? name.substring(0, 25) + '...' : name;
+                    doc.text(truncatedName, 40, yPos);
+                    
+                    // Email (truncar se muito longo)
+                    doc.setTextColor(127, 140, 141);
+                    const email = (item.email || 'Email não informado').toString();
+                    const truncatedEmail = email.length > 20 ? email.substring(0, 20) + '...' : email;
+                    doc.text(truncatedEmail, 100, yPos);
+                    
+                    // Pontos
+                    doc.setTextColor(39, 174, 96);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${item.totalPoints || 0}`, 160, yPos);
+                    
+                    yPos += 10;
+                    
+                    // Nova página se necessário
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 25;
+                    }
+                });
+            }
+            
+            // Resumo no final
+            if (yPos > 240) {
+                doc.addPage();
+                yPos = 30;
+            }
+            
+            yPos += 20;
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, yPos, 190, yPos);
+            yPos += 15;
+            
+            doc.setFontSize(14);
+            doc.setTextColor(44, 62, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Resumo do Período', 20, yPos);
+            
+            yPos += 10;
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total de participantes com pontuação: ${ranking.length}`, 20, yPos);
+            yPos += 7;
+            doc.text(`Total de atividades registradas: ${activities.length}`, 20, yPos);
+            yPos += 7;
+            doc.text(`Maior pontuação: ${ranking.length > 0 ? ranking[0].totalPoints : 0} pontos`, 20, yPos);
+            yPos += 7;
+            doc.text(`Total de clientes cadastrados: ${clients.length}`, 20, yPos);
+            
+            // Salvar PDF
+            doc.save(`ranking_${startDate}_a_${endDate}.pdf`);
+            console.log('✅ PDF salvo com sucesso!');
+        }
+        
+        // Função para gerar PDF de atividades
+        async function generateActivitiesPDF(activities, startDate, endDate) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configurar fonte
+            doc.setFont('helvetica');
+            
+            // Título
+            doc.setFontSize(20);
+            doc.setTextColor(44, 62, 80);
+            doc.text('Relatório de Atividades - ClientKey', 20, 25);
+            
+            // Período
+            doc.setFontSize(12);
+            doc.setTextColor(127, 140, 141);
+            doc.text(`Período: ${formatDate(startDate)} até ${formatDate(endDate)}`, 20, 35);
+            doc.text(`Gerado em: ${formatDate(new Date().toISOString().split('T')[0])}`, 20, 42);
+            
+            // Linha separadora
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, 50, 190, 50);
+            
+            // Estatísticas gerais
+            doc.setFontSize(14);
+            doc.setTextColor(44, 62, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Estatísticas do Período', 20, 62);
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total de atividades: ${activities.length}`, 25, 72);
+            
+            const totalPoints = activities.reduce((sum, activity) => sum + (activity.points || 0), 0);
+            doc.text(`Total de pontos distribuídos: ${totalPoints}`, 25, 79);
+            
+            const uniqueClients = new Set(activities.map(a => a.client_email || a.clientName)).size;
+            doc.text(`Clientes únicos que participaram: ${uniqueClients}`, 25, 86);
+            
+            // Salvar PDF
+            doc.save(`atividades_${startDate}_a_${endDate}.pdf`);
+        }
+        
+        // Função auxiliar para calcular ranking
+        function calculateRanking(clients, activities) {
+            console.log('📊 Calculando ranking...');
+            console.log('Clientes recebidos:', clients.length);
+            console.log('Atividades recebidas:', activities.length);
+            
+            const clientPoints = {};
+            
+            // Inicializar clientes com 0 pontos
+            clients.forEach(client => {
+                const email = client.email.toLowerCase().trim();
+                clientPoints[email] = {
+                    name: client.name,
+                    email: client.email,
+                    totalPoints: 0,
+                    activitiesCount: 0
+                };
+            });
+            
+            console.log('Clientes inicializados:', Object.keys(clientPoints).length);
+            
+            // Somar pontos das atividades - verificar múltiplos campos
+            activities.forEach((activity, index) => {
+                // Tentar diferentes campos de email
+                const possibleEmails = [
+                    activity.client_email,
+                    activity.clientEmail, 
+                    activity.email,
+                    activity.clientId ? clients.find(c => c.id === activity.clientId)?.email : null
+                ].filter(Boolean);
+                
+                const clientEmail = possibleEmails[0];
+                if (clientEmail) {
+                    const emailKey = clientEmail.toLowerCase().trim();
+                    
+                    if (clientPoints[emailKey]) {
+                        const points = parseInt(activity.points) || 0;
+                        clientPoints[emailKey].totalPoints += points;
+                        clientPoints[emailKey].activitiesCount++;
+                        
+                        if (index < 5) { // Log apenas as primeiras 5 para debug
+                            console.log(`Atividade ${index + 1}: ${emailKey} +${points} pontos`);
+                        }
+                    } else {
+                        // Cliente não encontrado - pode ser necessário criar
+                        if (activity.clientName || activity.client_name) {
+                            clientPoints[emailKey] = {
+                                name: activity.clientName || activity.client_name || emailKey,
+                                email: clientEmail,
+                                totalPoints: parseInt(activity.points) || 0,
+                                activitiesCount: 1
+                            };
+                        }
+                    }
+                }
+            });
+            
+            // Converter para array e ordenar por pontos
+            const ranking = Object.values(clientPoints)
+                .filter(client => client.totalPoints > 0)
+                .sort((a, b) => b.totalPoints - a.totalPoints);
+            
+            console.log('Ranking final:', ranking.length, 'participantes com pontos');
+            if (ranking.length > 0) {
+                console.log('Top 3:', ranking.slice(0, 3));
+            }
+            
+            return ranking;
+        }
+        
+        // Função auxiliar para formatar data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        
+        function viewAuditLogs() {
+            if (authService.hasPermission('view_logs') || authService.hasPermission('all')) {
+                window.location.href = 'audit-logs.html';
+            } else {
+                showMessage('Você não tem permissão para visualizar logs', 'error');
+            }
+        }
+        
+        /**
+         * Logout
+         */
+        function handleLogout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                authService.logout();
+                window.location.href = '../auth/login.html';
+            }
+        }
+        
+        /**
+         * Função utilitária para embaralhar array
+         */
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        /**
+         * Mostrar mensagem
+         */
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer') || document.body;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageContainer.removeChild(messageDiv);
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

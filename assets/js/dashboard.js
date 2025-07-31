@@ -474,8 +474,50 @@ const WORD_BANK = [
 ];
 
 // Keywords Management Functions
-function generateNewKeywords() {
+async function generateNewKeywords() {
     try {
+        // Mostrar loading no botão se existir
+        const generateBtn = document.getElementById('generateKeywordsBtn');
+        if (generateBtn) {
+            setButtonLoadingByElement(generateBtn, true);
+        }
+        
+        // Verificar se o DatabaseService está disponível
+        if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+            console.log('Gerando palavras-chave via DatabaseService...');
+            
+            // Usar o método generateKeywords do modelo Keyword
+            const result = await window.DatabaseService.generateKeywords();
+            
+            if (result.success) {
+                const keywordData = {
+                    id: result.data.id,
+                    correct: result.data.correct_word,
+                    incorrect: JSON.parse(result.data.incorrect_words),
+                    timestamp: result.data.created_at
+                };
+                
+                // Mostrar palavra atual
+                showCurrentKeyword(keywordData);
+                
+                // Mostrar preview para clientes
+                showKeywordPreview(keywordData.correct, keywordData.incorrect);
+                
+                // Atualizar status
+                updateKeywordStatus(true);
+                
+                showMessage(`Nova palavra-chave salva no banco: "${keywordData.correct}"`, 'success');
+                console.log('Palavra-chave gerada e salva no banco:', keywordData);
+                
+                return;
+            } else {
+                console.warn('Falha ao gerar via DatabaseService, usando método local:', result.error);
+            }
+        }
+        
+        // Fallback: Geração local (método anterior)
+        console.log('Gerando palavras-chave localmente...');
+        
         // Gerar palavra correta aleatória
         const correctWord = WORD_BANK[Math.floor(Math.random() * WORD_BANK.length)];
         
@@ -495,12 +537,26 @@ function generateNewKeywords() {
             timestamp: new Date().toISOString()
         };
         
-        // Salvar no Firebase/localStorage
-        if (window.FirebaseDB && window.FirebaseDB.saveKeywords) {
-            window.FirebaseDB.saveKeywords(keywordData);
-        } else {
-            localStorage.setItem('currentKeywords', JSON.stringify(keywordData));
+        // Tentar salvar no DatabaseService primeiro
+        if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+            try {
+                const saveResult = await window.DatabaseService.createKeywords({
+                    correct_word: correctWord,
+                    incorrect_words: incorrectWords
+                });
+                
+                if (saveResult.success) {
+                    console.log('Palavra-chave salva no banco via método alternativo');
+                    keywordData.id = saveResult.data.id;
+                    keywordData.timestamp = saveResult.data.created_at;
+                }
+            } catch (error) {
+                console.warn('Erro ao salvar no banco, usando localStorage:', error);
+            }
         }
+        
+        // Fallback para localStorage
+        localStorage.setItem('currentKeywords', JSON.stringify(keywordData));
         
         // Mostrar palavra atual
         showCurrentKeyword(keywordData);
@@ -512,13 +568,17 @@ function generateNewKeywords() {
         updateKeywordStatus(true);
         
         showMessage(`Nova palavra gerada: "${keywordData.correct}"`, 'success');
-        
-        // Debug: Verificar se foi salvo corretamente
-        console.log('Palavra-chave gerada e salva:', keywordData);
+        console.log('Palavra-chave gerada:', keywordData);
         
     } catch (error) {
         console.error('Erro ao gerar palavras-chave:', error);
         showMessage('Erro ao gerar palavras-chave. Tente novamente.', 'error');
+    } finally {
+        // Remover loading do botão
+        const generateBtn = document.getElementById('generateKeywordsBtn');
+        if (generateBtn) {
+            setButtonLoadingByElement(generateBtn, false);
+        }
     }
 }
 
@@ -557,59 +617,114 @@ function showKeywordPreview(correctWord, incorrectWords) {
     keywordPreview.style.display = 'block';
 }
 
-function clearKeywords() {
+async function clearKeywords() {
     if (confirm('Tem certeza que deseja limpar as palavras-chave atuais?')) {
-        // Limpar do Firebase
-        if (window.FirebaseDB && window.FirebaseDB.clearCurrentKeywords) {
-            window.FirebaseDB.clearCurrentKeywords();
-        }
-        
-        // Limpar do localStorage
-        localStorage.removeItem('currentKeywords');
-        
-        // Mostrar estado vazio
-        currentKeywordDisplay.innerHTML = `
-            <div class="no-keyword">
-                <i class="fas fa-clock"></i>
-                <p>Nenhuma palavra ativa no momento</p>
-            </div>
-        `;
-        
-        keywordPreview.style.display = 'none';
-        updateKeywordStatus(false);
-        showMessage('Palavras-chave limpas!', 'info');
-    }
-}
-
-function loadKeywordStatus() {
-    let currentKeywords = null;
-    
-    // Tentar carregar do Firebase primeiro
-    if (window.FirebaseDB && window.FirebaseDB.getCurrentKeywords) {
-        currentKeywords = window.FirebaseDB.getCurrentKeywords();
-    }
-    
-    // Fallback para localStorage
-    if (!currentKeywords) {
-        const saved = localStorage.getItem('currentKeywords');
-        if (saved) {
-            try {
-                currentKeywords = JSON.parse(saved);
-            } catch (error) {
-                console.error('Erro ao carregar palavras do localStorage:', error);
+        try {
+            // Mostrar loading
+            const clearBtn = document.getElementById('clearKeywordsBtn');
+            if (clearBtn) {
+                setButtonLoadingByElement(clearBtn, true);
+            }
+            
+            // Limpar do DatabaseService primeiro
+            if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+                console.log('Limpando palavras-chave do banco...');
+                const result = await window.DatabaseService.clearCurrentKeywords();
+                
+                if (result.success) {
+                    console.log('Palavras-chave limpas do banco com sucesso');
+                } else {
+                    console.warn('Erro ao limpar do banco:', result.error);
+                }
+            }
+            
+            // Limpar do localStorage
+            localStorage.removeItem('currentKeywords');
+            
+            // Mostrar estado vazio
+            currentKeywordDisplay.innerHTML = `
+                <div class="no-keyword">
+                    <i class="fas fa-clock"></i>
+                    <p>Nenhuma palavra ativa no momento</p>
+                    <small>Use o botão "Gerar Palavras" para criar novas palavras-chave</small>
+                </div>
+            `;
+            
+            keywordPreview.style.display = 'none';
+            updateKeywordStatus(false);
+            showMessage('Palavras-chave limpas com sucesso!', 'info');
+            
+        } catch (error) {
+            console.error('Erro ao limpar palavras-chave:', error);
+            showMessage('Erro ao limpar palavras-chave. Tente novamente.', 'error');
+        } finally {
+            // Remover loading
+            const clearBtn = document.getElementById('clearKeywordsBtn');
+            if (clearBtn) {
+                setButtonLoadingByElement(clearBtn, false);
             }
         }
     }
-    
-    if (currentKeywords && currentKeywords.correct && currentKeywords.incorrect) {
-        showCurrentKeyword(currentKeywords);
-        showKeywordPreview(currentKeywords.correct, currentKeywords.incorrect);
-        updateKeywordStatus(true);
-    } else {
+}
+
+async function loadKeywordStatus() {
+    try {
+        let currentKeywords = null;
+        
+        // Tentar carregar do DatabaseService primeiro
+        if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+            console.log('Carregando palavras-chave do banco...');
+            const result = await window.DatabaseService.getCurrentKeywords();
+            
+            if (result.success && result.data) {
+                currentKeywords = {
+                    id: result.data.id,
+                    correct: result.data.correct_word,
+                    incorrect: JSON.parse(result.data.incorrect_words),
+                    timestamp: result.data.created_at
+                };
+                console.log('Palavras-chave carregadas do banco:', currentKeywords);
+            }
+        }
+        
+        // Fallback para localStorage se não encontrou no banco
+        if (!currentKeywords) {
+            console.log('Carregando palavras-chave do localStorage...');
+            const saved = localStorage.getItem('currentKeywords');
+            if (saved) {
+                try {
+                    currentKeywords = JSON.parse(saved);
+                } catch (error) {
+                    console.error('Erro ao carregar palavras do localStorage:', error);
+                }
+            }
+        }
+        
+        // Exibir palavras-chave se encontradas
+        if (currentKeywords && currentKeywords.correct && currentKeywords.incorrect) {
+            showCurrentKeyword(currentKeywords);
+            showKeywordPreview(currentKeywords.correct, currentKeywords.incorrect);
+            updateKeywordStatus(true);
+            console.log('Palavras-chave ativas:', currentKeywords.correct);
+        } else {
+            console.log('Nenhuma palavra-chave ativa encontrada');
+            currentKeywordDisplay.innerHTML = `
+                <div class="no-keyword">
+                    <i class="fas fa-clock"></i>
+                    <p>Nenhuma palavra ativa no momento</p>
+                    <small>Use o botão "Gerar Palavras" para criar novas palavras-chave</small>
+                </div>
+            `;
+            updateKeywordStatus(false);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar status das palavras-chave:', error);
         currentKeywordDisplay.innerHTML = `
             <div class="no-keyword">
-                <i class="fas fa-clock"></i>
-                <p>Nenhuma palavra ativa no momento</p>
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erro ao carregar palavras-chave</p>
+                <small>Tente recarregar a página</small>
             </div>
         `;
         updateKeywordStatus(false);

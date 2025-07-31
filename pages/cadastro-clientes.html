@@ -7,6 +7,128 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos para campos com erro */
+        .form-group input.error {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1) !important;
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+            min-height: 16px;
+        }
+        
+        /* Estilos para mensagem de sucesso detalhada */
+        .message.success-detailed {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .success-icon {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 5px;
+        }
+        
+        .success-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .success-content p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        
+        .success-content small {
+            opacity: 0.9;
+            font-size: 13px;
+        }
+        
+        /* Loading no botão */
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Melhorar aparência dos campos */
+        .form-group input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            outline: none;
+        }
+        
+        .form-group input[type="tel"] {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        
+        /* Container de mensagens */
+        .message-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            pointer-events: none;
+        }
+        
+        .message-container .message {
+            pointer-events: all;
+            margin-bottom: 10px;
+        }
+        
+        /* Animações */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .message {
+            animation: slideInRight 0.3s ease forwards;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -83,6 +205,8 @@
                                 placeholder="(11) 99999-9999"
                                 required
                                 autocomplete="tel"
+                                maxlength="15"
+                                title="Digite seu WhatsApp no formato (11) 99999-9999"
                             >
                             <span class="error-message" id="whatsappError"></span>
                         </div>
@@ -125,8 +249,39 @@
         <i class="fas fa-cloud"></i> Conectado ao Firebase
     </div>
 
+    <!-- Proteção Administrativa (opcional para páginas mistas) -->
+    <script src="../auth/AuthService.js"></script>
+    
+    <!-- Database System Scripts -->
+    <script src="../database/connection.js"></script>
+    <script src="../database/models/Client.js"></script>
+    <script src="../database/models/Activity.js"></script>
+    <script src="../database/models/Keyword.js"></script>
+    <script src="../database/services/DatabaseService.js"></script>
+    <script src="../database/services/BackupService.js"></script>
+    <script src="../database/services/AuditService.js"></script>
+    <script src="../database/services/ErrorHandler.js"></script>
+    <script src="../database/migration/DataMigration.js"></script>
+    
     <!-- Firebase Configuration -->
-    <script type="module" src="../firebase-config.js"></script>
+    <script src="../firebase-config.js"></script>
     <script src="../assets/js/cadastro-clientes.js"></script>
+    
+    <script>
+        // Detectar se é acesso administrativo e redirecionar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Se o usuário está autenticado como admin, sugerir ir para área administrativa
+            setTimeout(() => {
+                if (typeof authService !== 'undefined' && authService.isAuthenticated()) {
+                    const user = authService.getCurrentUser();
+                    if (user && (user.role === 'super_admin' || user.role === 'moderator')) {
+                        if (confirm('Você está logado como administrador. Deseja ir para o painel administrativo?')) {
+                            window.location.href = '../admin/dashboard.html';
+                        }
+                    }
+                }
+            }, 2000);
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Rápido - Sistema de Banco</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #log { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; margin: 20px 0; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Rápido do Sistema de Banco de Dados</h1>
+        
+        <div id="systemStatus" class="status info">
+            ⏳ Inicializando sistema...
+        </div>
+        
+        <button onclick="testAddClient()">➕ Testar Adicionar Cliente</button>
+        <button onclick="testListClients()">📋 Listar Clientes</button>
+        <button onclick="checkStatus()">🔍 Verificar Status</button>
+        <button onclick="clearLog()">🧹 Limpar Log</button>
+        
+        <div id="log"></div>
+    </div>
+
+    <!-- Database System Scripts -->
+    <script src="database/connection.js"></script>
+    <script src="database/models/Client.js"></script>
+    <script src="database/models/Activity.js"></script>
+    <script src="database/models/Keyword.js"></script>
+    <script src="database/models/UserAttempts.js"></script>
+    <script src="database/models/Award.js"></script>
+    <script src="database/services/DatabaseService.js"></script>
+    <script src="database/services/AuditService.js"></script>
+    <script src="database/services/ErrorHandler.js"></script>
+    <script src="database/migration/DataMigration.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        let systemReady = false;
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            const logElement = document.getElementById('log');
+            logElement.textContent += logEntry + '\n';
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(logEntry);
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('systemStatus');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+        
+        async function checkStatus() {
+            try {
+                log('🔍 Verificando status do sistema...');
+                
+                if (typeof window.FirebaseDB === 'undefined') {
+                    log('❌ window.FirebaseDB não encontrado');
+                    updateStatus('❌ Sistema não carregado', 'error');
+                    return;
+                }
+                
+                if (typeof window.databaseService !== 'undefined') {
+                    const health = await window.databaseService.healthCheck();
+                    log(`✅ DatabaseService: ${health.provider} (${health.status})`);
+                } else {
+                    log('⚠️ DatabaseService não encontrado');
+                }
+                
+                const isAvailable = window.FirebaseDB.isAvailable();
+                log(`📊 FirebaseDB.isAvailable(): ${isAvailable}`);
+                
+                updateStatus('✅ Sistema funcionando', 'success');
+                systemReady = true;
+                
+            } catch (error) {
+                log(`❌ Erro ao verificar status: ${error.message}`);
+                updateStatus('❌ Erro no sistema', 'error');
+            }
+        }
+        
+        async function testAddClient() {
+            try {
+                if (!systemReady) {
+                    log('⚠️ Sistema não está pronto. Executando checkStatus primeiro...');
+                    await checkStatus();
+                }
+                
+                log('➕ Testando adicionar cliente...');
+                
+                const clientData = {
+                    name: 'Cliente Teste ' + Date.now(),
+                    email: `teste${Date.now()}@email.com`,
+                    whatsapp: '(11) 99999-9999',
+                    status: 'active'
+                };
+                
+                const result = await window.FirebaseDB.addClient(clientData);
+                
+                if (result && result.id) {
+                    log(`✅ Cliente adicionado com sucesso: ${result.name} (ID: ${result.id})`);
+                    updateStatus('✅ Cliente adicionado com sucesso', 'success');
+                } else {
+                    log('❌ Falha ao adicionar cliente - resultado inválido');
+                    updateStatus('❌ Falha ao adicionar cliente', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro ao adicionar cliente: ${error.message}`);
+                updateStatus('❌ Erro ao adicionar cliente', 'error');
+            }
+        }
+        
+        async function testListClients() {
+            try {
+                log('📋 Listando clientes...');
+                
+                const clients = await window.FirebaseDB.getClients();
+                
+                if (Array.isArray(clients)) {
+                    log(`📊 ${clients.length} clientes encontrados:`);
+                    clients.forEach((client, index) => {
+                        log(`   ${index + 1}. ${client.name} (${client.email})`);
+                    });
+                    updateStatus(`✅ ${clients.length} clientes carregados`, 'success');
+                } else {
+                    log('❌ Formato inválido retornado');
+                    updateStatus('❌ Erro ao carregar clientes', 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Erro ao listar clientes: ${error.message}`);
+                updateStatus('❌ Erro ao listar clientes', 'error');
+            }
+        }
+        
+        // Inicialização automática
+        document.addEventListener('DOMContentLoaded', async function() {
+            log('🚀 Iniciando teste do sistema...');
+            
+            // Aguardar sistemas carregarem
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            await checkStatus();
+        });
+    </script>
+</body>
+</html>

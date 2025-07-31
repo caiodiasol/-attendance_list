@@ -57,3 +57,4 @@ coverage/
 local-data.json
 backup-*.json
 export-*.csv
+.aider*

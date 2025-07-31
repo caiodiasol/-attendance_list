@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs de Auditoria - ClientKey Admin</title>
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .admin-navbar {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 20px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-group label {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .filters-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        .btn-filter {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-filter:hover {
+            background: #2980b9;
+        }
+        
+        .btn-clear {
+            padding: 10px 20px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-export {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .logs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .logs-header {
+            background: #f8f9fa;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logs-header h2 {
+            color: #2c3e50;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logs-count {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .logs-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid #f1f2f6;
+            transition: background 0.2s ease;
+        }
+        
+        .log-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .log-main-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .log-icon.login_success {
+            background: #27ae60;
+        }
+        
+        .log-icon.login_failed {
+            background: #e74c3c;
+        }
+        
+        .log-icon.logout {
+            background: #f39c12;
+        }
+        
+        .log-icon.user_created,
+        .log-icon.user_updated {
+            background: #3498db;
+        }
+        
+        .log-icon.user_deleted {
+            background: #e74c3c;
+        }
+        
+        .log-icon.system_action {
+            background: #9b59b6;
+        }
+        
+        .log-title {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .log-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .log-time {
+            color: #95a5a6;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .log-details {
+            margin-top: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .log-details.show {
+            display: block;
+        }
+        
+        .log-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .log-detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .log-detail-label {
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        .log-detail-value {
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .toggle-details {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+        }
+        
+        .toggle-details:hover {
+            text-decoration: underline;
+        }
+        
+        .no-logs {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .no-logs i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3498db;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination button.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Administrativa -->
+    <nav class="navbar admin-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i>
+                <span>Painel Administrativo</span>
+            </div>
+            
+            <div class="nav-links">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users"></i> Usuários
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Relatórios
+                </a>
+                <a href="audit-logs.html" class="nav-link active">
+                    <i class="fas fa-clipboard-list"></i> Logs
+                </a>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Carregando...</div>
+                    <div class="user-role" id="userRole"></div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Logs de Auditoria</h1>
+                    <p>Visualize todas as atividades administrativas do sistema</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Estatísticas -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total de Logs</h3>
+                    <div class="stat-value" id="totalLogs">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Logins Hoje</h3>
+                    <div class="stat-value" id="loginsToday">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Ações de Usuários</h3>
+                    <div class="stat-value" id="userActions">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Falhas de Login</h3>
+                    <div class="stat-value" id="loginFailures">0</div>
+                </div>
+            </section>
+
+            <!-- Filtros -->
+            <section class="filters-section">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">
+                    <i class="fas fa-filter"></i> Filtros de Busca
+                </h3>
+                
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="actionFilter">Tipo de Ação</label>
+                        <select id="actionFilter">
+                            <option value="">Todas as ações</option>
+                            <option value="login_success">Login bem-sucedido</option>
+                            <option value="login_failed">Falha no login</option>
+                            <option value="logout">Logout</option>
+                            <option value="user_created">Usuário criado</option>
+                            <option value="user_updated">Usuário atualizado</option>
+                            <option value="user_deleted">Usuário excluído</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="userFilter">Usuário</label>
+                        <input type="text" id="userFilter" placeholder="Nome do usuário">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="dateFromFilter">Data Inicial</label>
+                        <input type="date" id="dateFromFilter">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="dateToFilter">Data Final</label>
+                        <input type="date" id="dateToFilter">
+                    </div>
+                </div>
+                
+                <div class="filters-actions">
+                    <button class="btn-clear" onclick="clearFilters()">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                    <button class="btn-export" onclick="exportLogs()">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button class="btn-filter" onclick="applyFilters()">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </section>
+
+            <!-- Lista de Logs -->
+            <section class="logs-container">
+                <div class="logs-header">
+                    <h2>
+                        <i class="fas fa-list"></i>
+                        Registro de Atividades
+                    </h2>
+                    <span class="logs-count" id="logsCount">0 logs</span>
+                </div>
+                
+                <div class="logs-list" id="logsList">
+                    <!-- Logs serão carregados aqui -->
+                </div>
+                
+                <div class="pagination" id="pagination">
+                    <!-- Paginação será inserida aqui -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Scripts de Autenticação -->
+    <script src="../auth/AuthService.js"></script>
+    <script src="../auth/RouteGuard.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let allLogs = [];
+        let filteredLogs = [];
+        let currentPage = 1;
+        const logsPerPage = 20;
+        
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando página de logs...');
+            
+            // Verificar autenticação e permissão
+            if (!authService.isAuthenticated()) {
+                authService.redirectToLogin();
+                return;
+            }
+            
+            if (!authService.hasPermission('view_logs') && !authService.hasPermission('all')) {
+                authService.showAccessDenied();
+                return;
+            }
+            
+            // Carregar informações do usuário atual
+            loadCurrentUserInfo();
+            
+            // Carregar logs
+            loadLogs();
+            
+            // Configurar data inicial (últimos 30 dias)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('dateFromFilter').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('dateToFilter').value = today.toISOString().split('T')[0];
+        });
+        
+        /**
+         * Carregar informações do usuário atual
+         */
+        function loadCurrentUserInfo() {
+            const user = authService.getCurrentUser();
+            if (user) {
+                document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+                document.getElementById('userName').textContent = user.username;
+                document.getElementById('userRole').textContent = user.role.replace('_', ' ').toUpperCase();
+            }
+        }
+        
+        /**
+         * Carregar logs de auditoria
+         */
+        function loadLogs() {
+            try {
+                allLogs = authService.getActivityLogs({ limit: 1000 });
+                filteredLogs = [...allLogs];
+                
+                updateStatistics();
+                displayLogs();
+                
+                console.log('✅ Logs carregados:', allLogs.length);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar logs:', error);
+                showMessage('Erro ao carregar logs de auditoria', 'error');
+            }
+        }
+        
+        /**
+         * Atualizar estatísticas
+         */
+        function updateStatistics() {
+            const today = new Date().toDateString();
+            
+            const stats = {
+                total: allLogs.length,
+                loginsToday: allLogs.filter(log => 
+                    log.action === 'login_success' && 
+                    new Date(log.timestamp).toDateString() === today
+                ).length,
+                userActions: allLogs.filter(log => 
+                    ['user_created', 'user_updated', 'user_deleted'].includes(log.action)
+                ).length,
+                loginFailures: allLogs.filter(log => 
+                    log.action === 'login_failed'
+                ).length
+            };
+            
+            document.getElementById('totalLogs').textContent = stats.total;
+            document.getElementById('loginsToday').textContent = stats.loginsToday;
+            document.getElementById('userActions').textContent = stats.userActions;
+            document.getElementById('loginFailures').textContent = stats.loginFailures;
+        }
+        
+        /**
+         * Exibir logs
+         */
+        function displayLogs() {
+            const logsList = document.getElementById('logsList');
+            const logsCount = document.getElementById('logsCount');
+            
+            if (filteredLogs.length === 0) {
+                logsList.innerHTML = `
+                    <div class="no-logs">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Nenhum log encontrado</h3>
+                        <p>Não há logs que correspondam aos filtros aplicados</p>
+                    </div>
+                `;
+                logsCount.textContent = '0 logs';
+                return;
+            }
+            
+            // Paginação
+            const startIndex = (currentPage - 1) * logsPerPage;
+            const endIndex = startIndex + logsPerPage;
+            const pageData = filteredLogs.slice(startIndex, endIndex);
+            
+            // Renderizar logs
+            logsList.innerHTML = '';
+            pageData.forEach(log => {
+                const logItem = createLogItem(log);
+                logsList.appendChild(logItem);
+            });
+            
+            // Atualizar contador e paginação
+            logsCount.textContent = `${filteredLogs.length} logs`;
+            updatePagination();
+        }
+        
+        /**
+         * Criar item de log
+         */
+        function createLogItem(log) {
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            
+            const logInfo = getLogInfo(log);
+            const timestamp = new Date(log.timestamp);
+            
+            logItem.innerHTML = `
+                <div class="log-header">
+                    <div class="log-main-info">
+                        <div class="log-icon ${log.action}">
+                            <i class="${logInfo.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="log-title">${logInfo.title}</div>
+                            <div class="log-description">${logInfo.description}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="log-time">${timestamp.toLocaleString('pt-BR')}</div>
+                        <button class="toggle-details" onclick="toggleLogDetails('${log.id}')">
+                            Ver detalhes
+                        </button>
+                    </div>
+                </div>
+                <div class="log-details" id="details-${log.id}">
+                    <div class="log-details-grid">
+                        ${Object.entries(log.details || {}).map(([key, value]) => `
+                            <div class="log-detail-item">
+                                <span class="log-detail-label">${formatDetailKey(key)}:</span>
+                                <span class="log-detail-value">${formatDetailValue(value)}</span>
+                            </div>
+                        `).join('')}
+                        <div class="log-detail-item">
+                            <span class="log-detail-label">ID:</span>
+                            <span class="log-detail-value">${log.id}</span>
+                        </div>
+                        <div class="log-detail-item">
+                            <span class="log-detail-label">URL:</span>
+                            <span class="log-detail-value">${log.url || 'N/A'}</span>
+                        </div>
+                        <div class="log-detail-item">
+                            <span class="log-detail-label">User Agent:</span>
+                            <span class="log-detail-value">${log.userAgent ? log.userAgent.substring(0, 50) + '...' : 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return logItem;
+        }
+        
+        /**
+         * Obter informações do log
+         */
+        function getLogInfo(log) {
+            const logTypes = {
+                'login_success': {
+                    title: 'Login Realizado',
+                    description: `Usuário ${log.details?.username || 'desconhecido'} fez login`,
+                    icon: 'fas fa-sign-in-alt'
+                },
+                'login_failed': {
+                    title: 'Falha no Login',
+                    description: `Tentativa de login com usuário ${log.details?.username || 'desconhecido'}`,
+                    icon: 'fas fa-exclamation-triangle'
+                },
+                'logout': {
+                    title: 'Logout Realizado',
+                    description: `Usuário ${log.details?.username || 'desconhecido'} saiu do sistema`,
+                    icon: 'fas fa-sign-out-alt'
+                },
+                'user_created': {
+                    title: 'Usuário Criado',
+                    description: `Novo usuário ${log.details?.targetUsername || 'desconhecido'} foi criado`,
+                    icon: 'fas fa-user-plus'
+                },
+                'user_updated': {
+                    title: 'Usuário Atualizado',
+                    description: `Usuário ${log.details?.targetUsername || 'desconhecido'} foi atualizado`,
+                    icon: 'fas fa-user-edit'
+                },
+                'user_deleted': {
+                    title: 'Usuário Excluído',
+                    description: `Usuário ${log.details?.targetUsername || 'desconhecido'} foi excluído`,
+                    icon: 'fas fa-user-minus'
+                }
+            };
+            
+            return logTypes[log.action] || {
+                title: 'Ação do Sistema',
+                description: `Ação: ${log.action}`,
+                icon: 'fas fa-cog'
+            };
+        }
+        
+        /**
+         * Alternar detalhes do log
+         */
+        function toggleLogDetails(logId) {
+            const details = document.getElementById(`details-${logId}`);
+            details.classList.toggle('show');
+        }
+        
+        /**
+         * Aplicar filtros
+         */
+        function applyFilters() {
+            const actionFilter = document.getElementById('actionFilter').value;
+            const userFilter = document.getElementById('userFilter').value.toLowerCase();
+            const dateFromFilter = document.getElementById('dateFromFilter').value;
+            const dateToFilter = document.getElementById('dateToFilter').value;
+            
+            filteredLogs = allLogs.filter(log => {
+                // Filtro por ação
+                if (actionFilter && log.action !== actionFilter) {
+                    return false;
+                }
+                
+                // Filtro por usuário
+                if (userFilter) {
+                    const username = log.details?.username?.toLowerCase() || '';
+                    const targetUsername = log.details?.targetUsername?.toLowerCase() || '';
+                    if (!username.includes(userFilter) && !targetUsername.includes(userFilter)) {
+                        return false;
+                    }
+                }
+                
+                // Filtro por data
+                const logDate = new Date(log.timestamp).toDateString();
+                if (dateFromFilter) {
+                    const fromDate = new Date(dateFromFilter).toDateString();
+                    if (logDate < fromDate) {
+                        return false;
+                    }
+                }
+                
+                if (dateToFilter) {
+                    const toDate = new Date(dateToFilter).toDateString();
+                    if (logDate > toDate) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            displayLogs();
+            
+            showMessage(`Filtro aplicado: ${filteredLogs.length} logs encontrados`, 'info');
+        }
+        
+        /**
+         * Limpar filtros
+         */
+        function clearFilters() {
+            document.getElementById('actionFilter').value = '';
+            document.getElementById('userFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            
+            filteredLogs = [...allLogs];
+            currentPage = 1;
+            displayLogs();
+            
+            showMessage('Filtros limpos', 'info');
+        }
+        
+        /**
+         * Exportar logs
+         */
+        function exportLogs() {
+            try {
+                const exportData = {
+                    exportDate: new Date().toISOString(),
+                    totalLogs: filteredLogs.length,
+                    filters: {
+                        action: document.getElementById('actionFilter').value,
+                        user: document.getElementById('userFilter').value,
+                        dateFrom: document.getElementById('dateFromFilter').value,
+                        dateTo: document.getElementById('dateToFilter').value
+                    },
+                    logs: filteredLogs
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                showMessage('Logs exportados com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao exportar logs:', error);
+                showMessage('Erro ao exportar logs', 'error');
+            }
+        }
+        
+        /**
+         * Atualizar paginação
+         */
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            // Botão anterior
+            paginationHTML += `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+            `;
+            
+            // Páginas
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Botão próximo
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Próximo <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            pagination.innerHTML = paginationHTML;
+        }
+        
+        /**
+         * Mudar página
+         */
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+            
+            if (page < 1 || page > totalPages) {
+                return;
+            }
+            
+            currentPage = page;
+            displayLogs();
+        }
+        
+        /**
+         * Utilitários
+         */
+        function formatDetailKey(key) {
+            const keyMap = {
+                'username': 'Usuário',
+                'targetUsername': 'Usuário Alvo',
+                'role': 'Função',
+                'ip': 'IP',
+                'sessionDuration': 'Duração da Sessão',
+                'newStatus': 'Novo Status'
+            };
+            
+            return keyMap[key] || key;
+        }
+        
+        function formatDetailValue(value) {
+            if (typeof value === 'number' && value > 1000000) {
+                // Provavelmente é duração em ms
+                const seconds = Math.floor(value / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                
+                if (hours > 0) {
+                    return `${hours}h ${minutes % 60}m`;
+                } else if (minutes > 0) {
+                    return `${minutes}m ${seconds % 60}s`;
+                } else {
+                    return `${seconds}s`;
+                }
+            }
+            
+            return String(value);
+        }
+        
+        /**
+         * Logout
+         */
+        function handleLogout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                authService.logout();
+                window.location.href = '../auth/login.html';
+            }
+        }
+        
+        /**
+         * Mostrar mensagem
+         */
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer') || document.body;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageContainer.removeChild(messageDiv);
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

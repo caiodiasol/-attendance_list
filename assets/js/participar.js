@@ -30,26 +30,34 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSavedEmail();
 });
 
-// Função para inicializar Firebase
+// Função para inicializar serviços de banco de dados
 async function initializeFirebase() {
     try {
-        // Aguardar o Firebase estar disponível
-        if (typeof window.FirebaseDB === 'undefined') {
+        // Aguardar o DatabaseService estar disponível
+        if (typeof window.DatabaseService === 'undefined') {
             setTimeout(initializeFirebase, 100);
             return;
         }
         
         // Mostrar indicador de carregamento
-        showMessage('Carregando dados dos clientes...', 'info');
+        showMessage('Carregando sistema de banco de dados...', 'info');
+        
+        // Verificar se DatabaseService está disponível
+        if (window.DatabaseService.isAvailable()) {
+            console.log('DatabaseService disponível na participação');
+            showMessage('Conectado ao banco de dados!', 'success');
+        } else {
+            console.log('DatabaseService não disponível, usando localStorage');
+            showMessage('Usando armazenamento local', 'info');
+        }
         
         // Carregar clientes
         await loadClients();
         
-        showMessage('Dados carregados com sucesso!', 'success');
-        console.log('Firebase inicializado na participação');
+        console.log('Sistema inicializado na participação');
     } catch (error) {
-        console.error('Erro ao inicializar Firebase na participação:', error);
-        showMessage('Erro ao conectar com Firebase. Usando dados locais.', 'error');
+        console.error('Erro ao inicializar sistema na participação:', error);
+        showMessage('Erro ao conectar com banco de dados. Usando dados locais.', 'error');
         
         // Fallback para localStorage
         loadClientsFromStorage();
@@ -103,14 +111,22 @@ function setupKeywordListener() {
     setInterval(loadAvailableKeywords, 3000);
 }
 
-// Função para carregar clientes do Firestore
+// Função para carregar clientes do banco de dados
 async function loadClients() {
     try {
         // Aguardar um pouco para garantir sincronização
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        clients = await window.FirebaseDB.getClients();
-        console.log('Clientes carregados na participação:', clients.length);
+        // Tentar carregar do DatabaseService primeiro
+        if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+            clients = await window.DatabaseService.getClients();
+            console.log('Clientes carregados do banco na participação:', clients.length);
+        } else {
+            // Fallback para localStorage
+            console.log('DatabaseService não disponível, carregando do localStorage');
+            loadClientsFromStorage();
+            return;
+        }
         
         // Mostrar clientes no console para debug
         clients.forEach(client => {
@@ -288,16 +304,25 @@ function setupKeywordListener() {
 }
 
 // Função para carregar palavras-chave disponíveis
-function loadAvailableKeywords() {
+async function loadAvailableKeywords() {
     try {
         let currentKeywords = null;
         
-        // Tentar carregar do Firebase primeiro
-        if (window.FirebaseDB && window.FirebaseDB.getCurrentKeywords) {
-            currentKeywords = window.FirebaseDB.getCurrentKeywords();
+        // Tentar carregar do DatabaseService primeiro
+        if (window.DatabaseService && window.DatabaseService.isAvailable()) {
+            const result = await window.DatabaseService.getCurrentKeywords();
+            
+            if (result.success && result.data) {
+                currentKeywords = {
+                    id: result.data.id,
+                    correct: result.data.correct_word,
+                    incorrect: JSON.parse(result.data.incorrect_words),
+                    timestamp: result.data.created_at
+                };
+            }
         }
         
-        // Fallback para localStorage
+        // Fallback para localStorage se não encontrou no banco
         if (!currentKeywords) {
             const saved = localStorage.getItem('currentKeywords');
             if (saved) {

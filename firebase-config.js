@@ -1,9 +1,11 @@
-// Firebase Configuration
-// Substitua pelos seus dados do Firebase Console
+// Database Configuration with Persistent Storage
+// Sistema híbrido que suporta MySQL, Firebase e localStorage
+
+// Configuração do Firebase (opcional)
 const firebaseConfig = {
     apiKey: "your-api-key-here",
     authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id",
+    projectId: "your-project-id", 
     storageBucket: "your-project-id.appspot.com",
     messagingSenderId: "123456789",
     appId: "1:123456789:web:abcdef123456"
@@ -12,11 +14,13 @@ const firebaseConfig = {
 // Verificar se Firebase está configurado
 const isFirebaseConfigured = firebaseConfig.apiKey !== "your-api-key-here";
 
+// Variáveis globais para compatibilidade
 let db = null;
 let app = null;
 let firebaseInitialized = false;
+let databaseServiceInitialized = false;
 
-console.log('Firebase config status:', isFirebaseConfigured ? 'Configurado' : 'Usando localStorage apenas');
+console.log('Database config status:', isFirebaseConfigured ? 'Firebase configurado' : 'Usando banco persistente + localStorage');
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -38,17 +42,148 @@ function createTimestamp() {
     return new Date().toISOString();
 }
 
-// Firebase utility functions
+// Inicializar serviço de banco de dados
+async function initializeDatabaseService() {
+    try {
+        // Carregar scripts necessários se não estiverem carregados
+        if (typeof window.databaseService === 'undefined') {
+            console.log('Carregando scripts do banco de dados...');
+            await loadDatabaseScripts();
+        }
+        
+        // Inicializar serviço
+        const initialized = await window.databaseService.initialize();
+        if (initialized) {
+            databaseServiceInitialized = true;
+            console.log('✅ Serviço de banco de dados inicializado');
+            
+            // Verificar se há dados para migrar
+            const dataMigration = new window.DataMigration(window.databaseService);
+            const dataCheck = dataMigration.checkDataToMigrate();
+            
+            if (dataCheck.hasData) {
+                console.log('📦 Dados encontrados no localStorage para migração:', dataCheck.details);
+                console.log('💡 Use migrateDatabaseData() para migrar os dados');
+            }
+        }
+        
+        return initialized;
+    } catch (error) {
+        console.error('Erro ao inicializar serviço de banco:', error);
+        return false;
+    }
+}
+
+// Carregar scripts do banco de dados dinamicamente
+async function loadDatabaseScripts() {
+    const scripts = [
+        'database/connection.js',
+        'database/models/Client.js',
+        'database/models/Activity.js',
+        'database/models/Keyword.js',
+        'database/services/DatabaseService.js',
+        'database/migration/DataMigration.js'
+    ];
+    
+    for (const script of scripts) {
+        try {
+            await loadScript(script);
+        } catch (error) {
+            console.warn(`Não foi possível carregar ${script}:`, error);
+        }
+    }
+}
+
+// Função auxiliar para carregar scripts
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// Função para migrar dados do localStorage para o banco
+async function migrateDatabaseData(options = {}) {
+    try {
+        if (!databaseServiceInitialized) {
+            throw new Error('Serviço de banco não inicializado');
+        }
+        
+        console.log('🚀 Iniciando migração dos dados...');
+        
+        const dataMigration = new window.DataMigration(window.databaseService);
+        const result = await dataMigration.migrate(options);
+        
+        if (result.success) {
+            console.log('✅ Migração concluída com sucesso!');
+            console.log('📊 Resumo:', result.summary);
+            window.showMessage('Migração de dados concluída com sucesso!', 'success');
+        } else {
+            console.error('❌ Erro na migração:', result.error);
+            window.showMessage('Erro durante a migração: ' + result.error, 'error');
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Erro ao migrar dados:', error);
+        window.showMessage('Erro ao migrar dados: ' + error.message, 'error');
+        return { success: false, error: error.message };
+    }
+}
+
+// Database utility functions (compatibilidade com código existente)
 window.FirebaseDB = {
-    // Verificar se Firebase está disponível
+    // Verificar se banco está disponível
     isAvailable() {
-        return false; // Sempre usar localStorage para garantir funcionamento
+        return databaseServiceInitialized && window.databaseService && window.databaseService.isAvailable();
     },
 
     // Clients functions
     async addClient(clientData) {
         console.log('Adicionando cliente:', clientData);
         
+        try {
+            // Tentar usar o serviço de banco primeiro
+            if (this.isAvailable()) {
+                const client = await window.databaseService.addClient(clientData);
+                console.log('Cliente adicionado via banco de dados:', client.id);
+                return client;
+            } else {
+                // Fallback para localStorage
+                console.log('Usando fallback localStorage para adicionar cliente');
+                return this.addClientToStorage(clientData);
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar cliente via banco, usando localStorage:', error);
+            return this.addClientToStorage(clientData);
+        }
+    },
+
+    async getClients() {
+        console.log('Carregando clientes...');
+        
+        try {
+            // Tentar usar o serviço de banco primeiro
+            if (this.isAvailable()) {
+                const clients = await window.databaseService.getClients();
+                console.log('Clientes carregados via banco de dados:', clients.length);
+                return clients;
+            } else {
+                // Fallback para localStorage
+                console.log('Usando fallback localStorage para carregar clientes');
+                return this.getClientsFromStorage();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar clientes via banco, usando localStorage:', error);
+            return this.getClientsFromStorage();
+        }
+    },
+
+    // Métodos de fallback para localStorage
+    addClientToStorage(clientData) {
         const clientWithId = {
             id: generateId(),
             ...clientData,
@@ -56,26 +191,12 @@ window.FirebaseDB = {
             updatedAt: createTimestamp()
         };
 
-        console.log('Cliente criado com ID:', clientWithId.id);
-
-        // Sempre salvar no localStorage (removido Firebase para garantir funcionamento)
         const clients = this.getClientsFromStorage();
         clients.push(clientWithId);
         localStorage.setItem(STORAGE_KEYS.clients, JSON.stringify(clients));
         
         console.log('Cliente salvo no localStorage. Total de clientes:', clients.length);
-
         return clientWithId;
-    },
-
-    async getClients() {
-        console.log('Carregando clientes do localStorage...');
-        
-        // Sempre usar localStorage para garantir funcionamento
-        const clients = this.getClientsFromStorage();
-        console.log('Clientes carregados:', clients.length);
-        
-        return clients;
     },
 
     getClientsFromStorage() {
@@ -86,7 +207,43 @@ window.FirebaseDB = {
     async updateClient(clientId, clientData) {
         console.log('Atualizando cliente:', clientId, clientData);
         
-        // Atualizar localStorage
+        try {
+            // Tentar usar o serviço de banco primeiro
+            if (this.isAvailable()) {
+                await window.databaseService.updateClient(clientId, clientData);
+                console.log('Cliente atualizado via banco de dados');
+                return true;
+            } else {
+                // Fallback para localStorage
+                return this.updateClientInStorage(clientId, clientData);
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar cliente via banco, usando localStorage:', error);
+            return this.updateClientInStorage(clientId, clientData);
+        }
+    },
+
+    async deleteClient(clientId) {
+        console.log('Deletando cliente:', clientId);
+        
+        try {
+            // Tentar usar o serviço de banco primeiro
+            if (this.isAvailable()) {
+                await window.databaseService.deleteClient(clientId);
+                console.log('Cliente deletado via banco de dados');
+                return true;
+            } else {
+                // Fallback para localStorage
+                return this.deleteClientFromStorage(clientId);
+            }
+        } catch (error) {
+            console.error('Erro ao deletar cliente via banco, usando localStorage:', error);
+            return this.deleteClientFromStorage(clientId);
+        }
+    },
+
+    // Métodos de fallback adicionais
+    updateClientInStorage(clientId, clientData) {
         const clients = this.getClientsFromStorage();
         const clientIndex = clients.findIndex(c => c.id === clientId);
         if (clientIndex !== -1) {
@@ -98,27 +255,39 @@ window.FirebaseDB = {
             localStorage.setItem(STORAGE_KEYS.clients, JSON.stringify(clients));
             console.log('Cliente atualizado no localStorage');
         }
-
         return true;
     },
 
-    async deleteClient(clientId) {
-        console.log('Deletando cliente:', clientId);
-        
-        // Deletar do localStorage
+    deleteClientFromStorage(clientId) {
         const clients = this.getClientsFromStorage();
         const filteredClients = clients.filter(c => c.id !== clientId);
         localStorage.setItem(STORAGE_KEYS.clients, JSON.stringify(filteredClients));
         
         console.log('Cliente deletado. Clientes restantes:', filteredClients.length);
-
         return true;
     },
 
     async findClientByEmailOrName(searchTerm) {
         console.log('Buscando cliente por:', searchTerm);
         
-        const clients = await this.getClients();
+        try {
+            // Tentar usar o serviço de banco primeiro
+            if (this.isAvailable()) {
+                const client = await window.databaseService.findClientByEmailOrName(searchTerm);
+                console.log('Cliente encontrado via banco de dados:', client ? client.name : 'Nenhum');
+                return client;
+            } else {
+                // Fallback para localStorage
+                return this.findClientInStorage(searchTerm);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar cliente via banco, usando localStorage:', error);
+            return this.findClientInStorage(searchTerm);
+        }
+    },
+
+    findClientInStorage(searchTerm) {
+        const clients = this.getClientsFromStorage();
         const searchLower = searchTerm.toLowerCase().trim();
         
         console.log('Total de clientes para buscar:', clients.length);
@@ -150,7 +319,6 @@ window.FirebaseDB = {
         }
         
         console.log('Cliente encontrado:', foundClient ? foundClient.name : 'Nenhum');
-        
         return foundClient;
     },
 
@@ -345,8 +513,8 @@ window.FirebaseDB = {
         const correctIndex = Math.floor(Math.random() * pool.length);
         const correctKeyword = pool[correctIndex];
         
-        // Gerar palavras incorretas
-        const incorrectKeywords = this.generateRandomKeywords(correctKeyword, 2);
+        // Gerar 3 palavras incorretas (para total de 4 palavras)
+        const incorrectKeywords = this.generateRandomKeywords(correctKeyword, 3);
         
         const keywordData = {
             correct: correctKeyword,
@@ -410,7 +578,7 @@ window.FirebaseDB = {
         return defaultPool;
     },
 
-    generateRandomKeywords(correctWord, count = 2) {
+    generateRandomKeywords(correctWord, count = 3) {
         const pool = this.getKeywordPool();
         const incorrectWords = [];
         
@@ -584,4 +752,44 @@ window.showMessage = function(message, type = 'success') {
     }
 };
 
-console.log('Firebase config carregado. Modo:', isFirebaseConfigured ? 'Firebase + localStorage' : 'Apenas localStorage');
+// Inicializar automaticamente quando o script for carregado
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🔄 Inicializando sistema de banco de dados...');
+    
+    try {
+        await initializeDatabaseService();
+        
+        // Verificar status do sistema
+        const healthCheck = await window.databaseService?.healthCheck();
+        
+        if (healthCheck) {
+            console.log(`✅ Sistema inicializado: ${healthCheck.provider}`);
+            console.log(`📊 Status: ${healthCheck.status}`);
+            
+            if (healthCheck.status === 'unavailable') {
+                console.log('⚠️ Banco de dados não disponível, usando localStorage como fallback');
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao inicializar sistema:', error);
+        console.log('📦 Sistema funcionará apenas com localStorage');
+    }
+});
+
+// Função global para verificar status do banco
+window.checkDatabaseStatus = async function() {
+    if (databaseServiceInitialized && window.databaseService) {
+        const health = await window.databaseService.healthCheck();
+        console.log('🔍 Status do banco de dados:', health);
+        return health;
+    } else {
+        console.log('🔍 Serviço de banco não inicializado');
+        return { status: 'not_initialized', provider: 'localStorage' };
+    }
+};
+
+// Função global para forçar migração
+window.migrateDatabaseData = migrateDatabaseData;
+
+console.log('Database config carregado. Modo:', isFirebaseConfigured ? 'Firebase + Banco Persistente + localStorage' : 'Banco Persistente + localStorage');
