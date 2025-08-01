@@ -129,12 +129,13 @@
         }
         
         .participation-form {
-            max-width: 600px;
+            max-width: 480px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(39, 174, 96, 0.1);
-            padding: 40px;
+            background: var(--card-bg, #1e293b);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color, #475569);
+            padding: 24px;
         }
         
         .form-group {
@@ -143,10 +144,11 @@
         
         .form-group label {
             display: block;
-            color: #2c3e50;
+            color: #f6f7f8;
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 16px;
+            text-align: center;
         }
         
         .form-group input,
@@ -158,6 +160,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             background: #f8f9fa;
+            text-align: center;
         }
         
         .form-group input:focus,
@@ -332,6 +335,28 @@
             100% { transform: rotate(360deg); }
         }
 
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
         /* Menu Hambúrguer */
         .hamburger-menu {
             display: none;
@@ -454,10 +479,6 @@
                         <i class="fas fa-trophy"></i>
                         <span>Ranking</span>
                     </a>
-                    <a href="ranking-ganhadores.html" class="nav-item">
-                        <i class="fas fa-crown"></i>
-                        <span>Ganhadores</span>
-                    </a>
                 </nav>
             </div>
             <div class="header-right">
@@ -490,10 +511,6 @@
             <a href="ranking.html" class="mobile-nav-item">
                 <i class="fas fa-trophy"></i>
                 <span>Ranking</span>
-            </a>
-            <a href="ranking-ganhadores.html" class="mobile-nav-item">
-                <i class="fas fa-crown"></i>
-                <span>Ganhadores</span>
             </a>
         </div>
     </header>
@@ -581,6 +598,11 @@
     <!-- Success/Error Messages -->
     <div id="messageContainer" class="message-container"></div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
     <!-- Database System Scripts -->
     <script src="../database/connection.js"></script>
     <script src="../database/models/Client.js"></script>
@@ -623,11 +645,30 @@
         }
 
         // Inicialização da página
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('🌟 Página de participação do cliente carregada');
             
             // Inicializar menu hambúrguer
             initializeHamburgerMenu();
+            
+            // Aguardar o sistema de banco estar disponível
+            console.log('⏳ Aguardando sistema de banco ficar disponível...');
+            let attempts = 0;
+            const maxAttempts = 20;
+            
+            while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                attempts++;
+            }
+            
+            if (typeof window.FirebaseDB !== 'undefined') {
+                console.log('✅ Sistema de banco carregado com sucesso');
+                
+                // Verificar se há estatísticas para exibir
+                updateUserStats();
+            } else {
+                console.log('⚠️ Sistema de banco não carregou completamente');
+            }
             
             // Não carregar palavras-chave automaticamente
             // Elas só serão carregadas após validação do e-mail
@@ -638,8 +679,10 @@
          */
         function loadCurrentKeywords() {
             try {
+                // Aguardar o sistema FirebaseDB estar disponível
                 if (typeof window.FirebaseDB === 'undefined') {
-                    console.log('⏳ Sistema de banco ainda não carregado...');
+                    console.log('⏳ Sistema de banco ainda não carregado, tentando novamente...');
+                    setTimeout(loadCurrentKeywords, 500);
                     return;
                 }
                 
@@ -732,8 +775,18 @@
                 // Mostrar loading
                 setValidationLoadingState(true);
                 
+                // Aguardar o sistema FirebaseDB estar disponível com timeout
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                    console.log('⏳ Sistema de banco ainda não carregado, aguardando...');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
                 if (typeof window.FirebaseDB === 'undefined') {
-                    console.log('⏳ Sistema de banco ainda não carregado...');
+                    console.log('❌ Sistema de banco não carregou após tentativas');
                     showMessage('Sistema ainda carregando. Tente novamente em alguns segundos.', 'error');
                     return;
                 }
@@ -745,6 +798,7 @@
                     showClientInfo(client);
                     showKeywordsSection();
                     loadCurrentKeywords();
+                    updateUserStats(); // Atualizar estatísticas após login
                     showMessage('E-mail validado com sucesso! Agora escolha a palavra-chave.', 'success');
                 } else {
                     foundClient = null;
@@ -807,6 +861,12 @@
                 
                 // Mostrar loading
                 setLoadingState(true);
+                
+                // Verificar se o sistema está disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco não está disponível. Tente novamente.', 'error');
+                    return;
+                }
                 
                 // Verificar se cliente já tentou
                 const hasAttempted = window.FirebaseDB.hasUserAttempted(
@@ -1026,18 +1086,82 @@
         }
         
         function showMessage(message, type = 'info') {
-            const messageContainer = document.getElementById('messageContainer') || document.body;
+            const messageContainer = document.getElementById('messageContainer');
+            
+            if (!messageContainer) {
+                // Fallback: criar container se não existir
+                const container = document.createElement('div');
+                container.id = 'messageContainer';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(container);
+            }
             
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${type}`;
+            messageDiv.style.cssText = `
+                padding: 12px 16px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideIn 0.3s ease;
+                ${type === 'success' ? 'background: #10b981; color: white;' : ''}
+                ${type === 'error' ? 'background: #ef4444; color: white;' : ''}
+                ${type === 'info' ? 'background: #3b82f6; color: white;' : ''}
+            `;
             messageDiv.textContent = message;
-            messageContainer.appendChild(messageDiv);
+            
+            const container = document.getElementById('messageContainer');
+            container.appendChild(messageDiv);
             
             setTimeout(() => {
                 if (messageDiv.parentNode) {
-                    messageContainer.removeChild(messageDiv);
+                    messageDiv.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            container.removeChild(messageDiv);
+                        }
+                    }, 300);
                 }
             }, 4000);
+        }
+
+        /**
+         * Atualizar estatísticas do usuário no header
+         */
+        async function updateUserStats() {
+            try {
+                if (typeof window.FirebaseDB === 'undefined') {
+                    return;
+                }
+
+                // Atualizar total de participantes
+                const clients = await window.FirebaseDB.getClients();
+                const totalUsersElement = document.getElementById('totalUsers');
+                if (totalUsersElement && clients) {
+                    totalUsersElement.textContent = clients.length;
+                }
+
+                // Se há um usuário logado, atualizar seus pontos
+                if (foundClient) {
+                    const activities = await window.FirebaseDB.getClientActivities(foundClient.id);
+                    if (activities) {
+                        const totalPoints = activities.reduce((sum, activity) => sum + (activity.points || 0), 0);
+                        const userPointsElement = document.getElementById('userPoints');
+                        if (userPointsElement) {
+                            userPointsElement.textContent = totalPoints;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar estatísticas:', error);
+            }
         }
     </script>
 </body>

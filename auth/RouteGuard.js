@@ -32,7 +32,6 @@ class RouteGuard {
         this.allowPublicRoute('/pages/cadastro-clientes.html');
         this.allowPublicRoute('/pages/participar.html');
         this.allowPublicRoute('/pages/ranking.html');
-        this.allowPublicRoute('/pages/ranking-ganhadores.html');
         this.allowPublicRoute('/auth/login.html');
         this.allowPublicRoute('/client/');
     }

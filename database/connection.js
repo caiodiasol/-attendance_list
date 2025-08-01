@@ -1,3 +1,4 @@
+const env = (typeof process !== 'undefined' && process.env) || window;
 // Database Connection Manager
 // Suporte para MySQL e Firebase com fallback para localStorage
 
@@ -10,11 +11,11 @@ class DatabaseConnection {
         
         // Configurações do MySQL
         this.mysqlConfig = {
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 3306,
-            user: process.env.DB_USER || 'root',
-            password: process.env.DB_PASS || '',
-            database: process.env.DB_NAME || 'clientkey',
+            host: env.DB_HOST || 'localhost',
+            port: env.DB_PORT || 3306,
+            user: env.DB_USER || 'root',
+            password: env.DB_PASS || '',
+            database: env.DB_NAME || 'clientkey',
             charset: 'utf8mb4',
             timezone: 'local',
             acquireTimeout: 60000,
@@ -24,12 +25,13 @@ class DatabaseConnection {
         
         // Configurações do Firebase
         this.firebaseConfig = {
-            apiKey: process.env.FIREBASE_API_KEY || "your-api-key-here",
-            authDomain: process.env.FIREBASE_AUTH_DOMAIN || "your-project-id.firebaseapp.com",
-            projectId: process.env.FIREBASE_PROJECT_ID || "your-project-id",
-            storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "your-project-id.appspot.com",
-            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "123456789",
-            appId: process.env.FIREBASE_APP_ID || "1:123456789:web:abcdef123456"
+            apiKey: env.FIREBASE_API_KEY || "AIzaSyAVdVaB69g20FhHS5tdMvLjWzxWZ7cuCU0",
+            authDomain: env.FIREBASE_AUTH_DOMAIN || "clientkey-b8ccf.firebaseapp.com",
+            projectId: env.FIREBASE_PROJECT_ID || "clientkey-b8ccf",
+            storageBucket: env.FIREBASE_STORAGE_BUCKET || "clientkey-b8ccf.firebasestorage.app",
+            messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID || "835785432053",
+            appId: env.FIREBASE_APP_ID || "1:835785432053:web:f5ceccc6cf07e1a6a79ebc",
+            measurementId: env.FIREBASE_MEASUREMENT_ID || "G-YVWDNJFG8K"
         };
     }
     

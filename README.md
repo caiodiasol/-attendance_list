@@ -56,12 +56,10 @@ ClientKey/
 │       ├── dashboard.js         # Lógica do admin (palavras-chave)
 │       ├── participar.js        # Lógica de participação
 │       ├── ranking.js           # Lógica do ranking
-│       └── ranking-ganhadores.js# Lógica dos ganhadores
 └── pages/
     ├── cadastro-clientes.html   # Página de cadastro
     ├── participar.html          # Interface de participação
     ├── ranking.html             # Ranking de presença
-    └── ranking-ganhadores.html  # Histórico de ganhadores
 ```
 
 ## 🎯 Fluxo de Funcionamento

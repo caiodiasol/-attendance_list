@@ -304,11 +304,14 @@ async function addClient() {
             const form = document.getElementById('clientForm');
             if (form) {
                 form.reset();
-                // Focar no primeiro campo para novo cadastro
-                document.getElementById('clientName').focus();
             }
             
             console.log('✅ Cliente cadastrado com sucesso:', newClient);
+            
+            // Redirecionar automaticamente para página de participar após 2 segundos
+            setTimeout(() => {
+                window.location.href = 'participar.html';
+            }, 2000);
         } else {
             throw new Error('Erro interno: dados do cliente não foram salvos corretamente.');
         }
@@ -337,6 +340,7 @@ function showSuccessMessage(name, email) {
             <p><strong>${name}</strong> foi cadastrado no sistema.</p>
             <p><small>📧 Email: ${email}</small></p>
             <p><small>✅ Você já pode participar da live e concorrer aos prêmios!</small></p>
+            <p><small>🔄 Redirecionando para página de participação...</small></p>
         </div>
     `;
 

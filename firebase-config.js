@@ -1,14 +1,15 @@
 // Database Configuration with Persistent Storage
 // Sistema híbrido que suporta MySQL, Firebase e localStorage
 
-// Configuração do Firebase (opcional)
+// Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "your-api-key-here",
-    authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id", 
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
+    apiKey: "AIzaSyBxPc0qnTlzJxVk4rP8H3m9L2nE0fG1dCs",
+    authDomain: "clientkey-system.firebaseapp.com",
+    databaseURL: "https://clientkey-system-default-rtdb.firebaseio.com",
+    projectId: "clientkey-system", 
+    storageBucket: "clientkey-system.appspot.com",
+    messagingSenderId: "654321098",
+    appId: "1:654321098:web:a1b2c3d4e5f6g7h8i9j0"
 };
 
 // Verificar se Firebase está configurado
@@ -42,9 +43,62 @@ function createTimestamp() {
     return new Date().toISOString();
 }
 
+// Inicializar Firebase
+async function initializeFirebase() {
+    try {
+        console.log('🔥 Tentando inicializar Firebase...');
+        console.log('Configuração Firebase válida:', isFirebaseConfigured);
+        console.log('Firebase SDK disponível:', typeof firebase !== 'undefined');
+        
+        if (isFirebaseConfigured && typeof firebase !== 'undefined') {
+            console.log('🔥 Inicializando Firebase com config:', firebaseConfig.projectId);
+            
+            // Inicializar Firebase
+            if (!firebase.apps.length) {
+                app = firebase.initializeApp(firebaseConfig);
+                console.log('Firebase app criado');
+            } else {
+                app = firebase.app();
+                console.log('Firebase app já existe');
+            }
+            
+            // Inicializar Realtime Database
+            db = firebase.database();
+            firebaseInitialized = true;
+            
+            console.log('✅ Firebase inicializado com sucesso');
+            
+            // Testar conexão
+            try {
+                await db.ref('.info/connected').once('value');
+                console.log('✅ Conexão com Firebase testada com sucesso');
+            } catch (testError) {
+                console.warn('⚠️ Teste de conexão falhou, mas Firebase foi inicializado:', testError.message);
+            }
+            
+            return true;
+        } else {
+            if (!isFirebaseConfigured) {
+                console.log('⚠️ Firebase não configurado corretamente');
+            }
+            if (typeof firebase === 'undefined') {
+                console.log('⚠️ Firebase SDK não carregado');
+            }
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao inicializar Firebase:', error);
+        firebaseInitialized = false;
+        return false;
+    }
+}
+
 // Inicializar serviço de banco de dados
 async function initializeDatabaseService() {
     try {
+        // Tentar inicializar Firebase primeiro
+        const firebaseInitialized = await initializeFirebase();
+        
         // Carregar scripts necessários se não estiverem carregados
         if (typeof window.databaseService === 'undefined') {
             console.log('Carregando scripts do banco de dados...');
@@ -461,7 +515,10 @@ window.FirebaseDB = {
                 const now = new Date();
                 let startDate = null;
                 
-                if (period === 'week') {
+                if (period === 'day') {
+                    // Início do dia atual
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                } else if (period === 'week') {
                     startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
                 } else if (period === 'month') {
                     startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);

@@ -367,11 +367,6 @@ async function executeAward() {
         
         showMessage('Premiação confirmada! Ganhadores salvos e ranking zerado.', 'success');
         
-        // Redirecionar após 2 segundos
-        setTimeout(() => {
-            window.location.href = 'ranking-ganhadores.html';
-        }, 2000);
-        
     } catch (error) {
         console.error('Erro ao executar premiação:', error);
         showMessage('Erro ao confirmar premiação. Tente novamente.', 'error');

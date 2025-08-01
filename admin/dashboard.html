@@ -603,13 +603,13 @@
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
                 <a href="users.html" class="nav-link">
-                    <i class="fas fa-users"></i> Usuários
+                    <i class="fas fa-users-cog"></i> Gerenciar Usuários
                 </a>
-                <a href="reports.html" class="nav-link">
-                    <i class="fas fa-chart-line"></i> Relatórios
+                <a href="clients.html" class="nav-link">
+                    <i class="fas fa-users"></i> Gerenciar Clientes
                 </a>
-                <a href="settings.html" class="nav-link">
-                    <i class="fas fa-cog"></i> Configurações
+                <a href="audit-logs.html" class="nav-link">
+                    <i class="fas fa-clipboard-list"></i> Logs de Auditoria
                 </a>
             </div>
             
@@ -742,10 +742,10 @@
                         <p>Adicionar, editar ou remover usuários</p>
                     </div>
                     
-                    <div class="quick-action-card" onclick="viewReports()">
-                        <i class="fas fa-chart-bar"></i>
-                        <h4>Relatórios</h4>
-                        <p>Visualizar estatísticas detalhadas</p>
+                    <div class="quick-action-card" onclick="showAwardConfirmationDialog()">
+                        <i class="fas fa-trophy"></i>
+                        <h4>Confirmar Premiação</h4>
+                        <p>Confirmar ganhadores e zerar o ranking</p>
                     </div>
                     
                     <div class="quick-action-card" onclick="exportClients()">
@@ -818,33 +818,43 @@
         </div>
     </div>
 
-    <!-- Modal para Relatórios PDF -->
-    <div id="reportsModal" class="modal" style="display: none;">
+    <!-- Modal para Confirmar Premiação -->
+    <div id="awardConfirmationModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-file-pdf"></i> Gerar Relatório PDF</h2>
-                <span class="close" onclick="closeReportsModal()">&times;</span>
+                <h2><i class="fas fa-trophy"></i> Confirmar Premiação</h2>
+                <span class="close" onclick="closeAwardConfirmationModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="startDate">Data Inicial:</label>
-                    <input type="date" id="startDate" name="startDate" required>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-trophy" style="font-size: 48px; color: #f39c12; margin-bottom: 15px;"></i>
+                    <p style="font-size: 16px; color: #2c3e50; margin-bottom: 10px;">
+                        <strong>Atenção!</strong> Esta ação irá:
+                    </p>
                 </div>
-                <div class="form-group">
-                    <label for="endDate">Data Final:</label>
-                    <input type="date" id="endDate" name="endDate" required>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #2c3e50;">
+                        <li style="margin-bottom: 8px;">✅ Salvar o ranking atual como resultado final</li>
+                        <li style="margin-bottom: 8px;">✅ Registrar os ganhadores no histórico</li>
+                        <li style="margin-bottom: 8px;">⚠️ Zerar completamente o ranking de todos os clientes</li>
+                        <li style="margin-bottom: 0;">⚠️ Limpar todas as atividades e pontuações</li>
+                    </ul>
                 </div>
-                <div class="form-group">
-                    <label for="reportType">Tipo de Relatório:</label>
-                    <select id="reportType" name="reportType">
-                        <option value="ranking">Ranking por Pontuação</option>
-                        <option value="activities">Atividades por Período</option>
-                    </select>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #856404; font-weight: 500;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Esta ação <strong>NÃO PODE SER DESFEITA</strong>. Certifique-se de que o ranking está correto antes de confirmar.
+                    </p>
                 </div>
+
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeReportsModal()">Cancelar</button>
-                    <button type="button" class="btn-primary" onclick="generatePDFReport()">
-                        <i class="fas fa-file-pdf"></i> Gerar PDF
+                    <button type="button" class="btn-secondary" onclick="closeAwardConfirmationModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-primary" onclick="confirmAward()" style="background: #e74c3c;">
+                        <i class="fas fa-trophy"></i> Confirmar Premiação
                     </button>
                 </div>
             </div>
@@ -1413,13 +1423,7 @@
             }
         }
         
-        function viewReports() {
-            if (authService.hasPermission('view_reports') || authService.hasPermission('all')) {
-                window.location.href = 'reports.html';
-            } else {
-                showMessage('Você não tem permissão para visualizar relatórios', 'error');
-            }
-        }
+        // Função viewReports() removida - substituída por showAwardConfirmationDialog()
         
         // Função para exportar clientes (CSV)
         async function exportClients() {
@@ -1460,26 +1464,353 @@
             }
         }
         
-        // Função para mostrar modal de relatórios
-        function showReportsDialog() {
-            if (!authService.hasPermission('view_reports') && !authService.hasPermission('all')) {
-                showMessage('Você não tem permissão para gerar relatórios', 'error');
+        // Função para mostrar modal de confirmação de premiação
+        function showAwardConfirmationDialog() {
+            if (!authService.hasPermission('manage_awards') && !authService.hasPermission('all')) {
+                showMessage('Você não tem permissão para confirmar premiações', 'error');
                 return;
             }
             
-            // Definir datas padrão (último mês)
-            const today = new Date();
-            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-            
-            document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
-            document.getElementById('endDate').value = today.toISOString().split('T')[0];
-            
-            document.getElementById('reportsModal').style.display = 'flex';
+            document.getElementById('awardConfirmationModal').style.display = 'flex';
         }
         
-        // Função para fechar modal de relatórios
-        function closeReportsModal() {
-            document.getElementById('reportsModal').style.display = 'none';
+        // Função para fechar modal de confirmação de premiação
+        function closeAwardConfirmationModal() {
+            document.getElementById('awardConfirmationModal').style.display = 'none';
+        }
+
+        // Função para confirmar premiação e zerar ranking
+        async function confirmAward() {
+            try {
+                if (!authService.hasPermission('manage_awards') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para confirmar premiações', 'error');
+                    return;
+                }
+
+                console.log('🏆 Iniciando confirmação de premiação...');
+                showMessage('Processando premiação...', 'info');
+
+                // Verificar se o sistema de banco está disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco não está disponível', 'error');
+                    return;
+                }
+
+                // Obter ranking atual
+                const rankingData = await window.FirebaseDB.getRankingData('all');
+                
+                if (!rankingData || rankingData.length === 0) {
+                    showMessage('Não há participantes no ranking para premiar', 'warning');
+                    closeAwardConfirmationModal();
+                    return;
+                }
+
+                console.log(`📊 Ranking obtido: ${rankingData.length} participantes`);
+
+                // Criar registro dos ganhadores
+                const winners = {
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString(),
+                    ranking: rankingData.slice(0, 10), // Top 10
+                    totalParticipants: rankingData.length,
+                    confirmedBy: authService.getCurrentUser()?.username || 'admin',
+                    confirmedAt: new Date().toISOString()
+                };
+
+                // Salvar ganhadores no histórico
+                try {
+                    let savedWinners = JSON.parse(localStorage.getItem('winners_history') || '[]');
+                    savedWinners.unshift(winners);
+                    localStorage.setItem('winners_history', JSON.stringify(savedWinners));
+                    console.log('✅ Ganhadores salvos no localStorage');
+                } catch (error) {
+                    console.error('❌ Erro ao salvar no localStorage:', error);
+                }
+
+                // Tentar salvar no Firebase se disponível
+                try {
+                    if (typeof window.FirebaseDB.saveWinners === 'function') {
+                        await window.FirebaseDB.saveWinners(winners);
+                        console.log('✅ Ganhadores salvos no Firebase');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Não foi possível salvar no Firebase:', error);
+                }
+
+                // Gerar PDF do ranking antes de zerar
+                await generateAwardPDF(rankingData, winners);
+
+                // Zerar o ranking
+                await clearAllRankingData();
+
+                // Fechar modal
+                closeAwardConfirmationModal();
+
+                // Atualizar estatísticas do dashboard
+                await loadStatistics();
+
+                showMessage(`Premiação confirmada! PDF gerado, ${rankingData.length} participantes foram registrados e o ranking foi zerado.`, 'success');
+
+                // Log da atividade
+                authService.logActivity('award_confirmed', {
+                    totalParticipants: rankingData.length,
+                    topWinner: rankingData[0]?.client?.name || 'N/A',
+                    topPoints: rankingData[0]?.points || 0,
+                    confirmedBy: authService.getCurrentUser()?.username
+                });
+
+                console.log('🎉 Premiação confirmada com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao confirmar premiação:', error);
+                showMessage('Erro ao confirmar premiação: ' + error.message, 'error');
+            }
+        }
+
+        // Função para gerar PDF do ranking completo na confirmação de premiação
+        async function generateAwardPDF(rankingData, winners) {
+            try {
+                console.log('📄 Gerando PDF da premiação...');
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Configurar fonte
+                doc.setFont('helvetica');
+                
+                // Header do documento
+                doc.setFontSize(24);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('RESULTADO FINAL DA PREMIAÇÃO', 20, 25);
+                
+                // Subtítulo
+                doc.setFontSize(16);
+                doc.setTextColor(52, 152, 219);
+                doc.setFont('helvetica', 'normal');
+                doc.text('ClientKey - Live Stream Competition', 20, 35);
+                
+                // Informações da premiação
+                doc.setFontSize(12);
+                doc.setTextColor(127, 140, 141);
+                const now = new Date();
+                doc.text(`Data da Premiação: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR')}`, 20, 45);
+                doc.text(`Confirmado por: ${winners.confirmedBy}`, 20, 52);
+                doc.text(`Total de Participantes: ${winners.totalParticipants}`, 20, 59);
+                
+                // Linha separadora
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, 65, 190, 65);
+                
+                let yPos = 80;
+                
+                // Título do ranking
+                doc.setFontSize(18);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('🏆 RANKING FINAL COMPLETO', 20, yPos);
+                yPos += 15;
+                
+                // Cabeçalho da tabela
+                doc.setFontSize(11);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                
+                // Fundo do cabeçalho
+                doc.setFillColor(52, 152, 219);
+                doc.rect(20, yPos - 6, 170, 10, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.text('Pos', 25, yPos);
+                doc.text('Nome do Cliente', 40, yPos);
+                doc.text('Email', 110, yPos);
+                doc.text('Pontos', 160, yPos);
+                doc.text('Últ. Atividade', 175, yPos);
+                
+                yPos += 12;
+                
+                // Dados do ranking
+                doc.setFont('helvetica', 'normal');
+                
+                rankingData.forEach((entry, index) => {
+                    // Verificar se precisa de nova página
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 25;
+                        
+                        // Repetir cabeçalho na nova página
+                        doc.setFillColor(52, 152, 219);
+                        doc.rect(20, yPos - 6, 170, 10, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('Pos', 25, yPos);
+                        doc.text('Nome do Cliente', 40, yPos);
+                        doc.text('Email', 110, yPos);
+                        doc.text('Pontos', 160, yPos);
+                        doc.text('Últ. Atividade', 175, yPos);
+                        yPos += 12;
+                        doc.setFont('helvetica', 'normal');
+                    }
+                    
+                    // Fundo alternado para melhor leitura
+                    if (index % 2 === 0) {
+                        doc.setFillColor(248, 249, 250);
+                        doc.rect(20, yPos - 6, 170, 8, 'F');
+                    }
+                    
+                    // Destacar top 3
+                    let positionColor = [44, 62, 80]; // Cor padrão
+                    let positionText = `${index + 1}º`;
+                    
+                    if (index === 0) {
+                        positionColor = [255, 215, 0]; // Ouro
+                        positionText = '🥇 1º';
+                    } else if (index === 1) {
+                        positionColor = [192, 192, 192]; // Prata
+                        positionText = '🥈 2º';
+                    } else if (index === 2) {
+                        positionColor = [205, 127, 50]; // Bronze
+                        positionText = '🥉 3º';
+                    }
+                    
+                    // Posição
+                    doc.setTextColor(...positionColor);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(positionText, 25, yPos);
+                    
+                    // Nome (truncar se muito longo)
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', index < 3 ? 'bold' : 'normal');
+                    const name = (entry.client?.name || 'Nome não informado').toString();
+                    const truncatedName = name.length > 25 ? name.substring(0, 22) + '...' : name;
+                    doc.text(truncatedName, 40, yPos);
+                    
+                    // Email (truncar se muito longo)
+                    doc.setTextColor(127, 140, 141);
+                    doc.setFont('helvetica', 'normal');
+                    const email = (entry.client?.email || 'Email não informado').toString();
+                    const truncatedEmail = email.length > 25 ? email.substring(0, 22) + '...' : email;
+                    doc.text(truncatedEmail, 110, yPos);
+                    
+                    // Pontos
+                    doc.setTextColor(39, 174, 96);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${entry.points || 0}`, 160, yPos);
+                    
+                    // Última atividade
+                    doc.setTextColor(127, 140, 141);
+                    doc.setFont('helvetica', 'normal');
+                    const lastActivity = new Date(entry.lastActivity);
+                    const activityText = lastActivity.toLocaleDateString('pt-BR');
+                    doc.text(activityText, 175, yPos);
+                    
+                    yPos += 8;
+                });
+                
+                // Estatísticas finais
+                if (yPos > 240) {
+                    doc.addPage();
+                    yPos = 30;
+                }
+                
+                yPos += 15;
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, yPos, 190, yPos);
+                yPos += 15;
+                
+                doc.setFontSize(16);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('📊 ESTATÍSTICAS FINAIS', 20, yPos);
+                
+                yPos += 12;
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'normal');
+                
+                const totalPoints = rankingData.reduce((sum, entry) => sum + (entry.points || 0), 0);
+                const avgPoints = rankingData.length > 0 ? Math.round(totalPoints / rankingData.length) : 0;
+                
+                // Grade de estatísticas
+                const stats = [
+                    { label: 'Total de Participantes:', value: `${rankingData.length}` },
+                    { label: 'Maior Pontuação:', value: `${rankingData[0]?.points || 0} pontos` },
+                    { label: 'Campeão:', value: `${rankingData[0]?.client?.name || 'N/A'}` },
+                    { label: 'Total de Pontos Distribuídos:', value: `${totalPoints} pontos` },
+                    { label: 'Média de Pontos:', value: `${avgPoints} pontos` },
+                    { label: 'Data da Competição:', value: `${now.toLocaleDateString('pt-BR')}` }
+                ];
+                
+                stats.forEach((stat, index) => {
+                    doc.setTextColor(127, 140, 141);
+                    doc.text(stat.label, 25, yPos);
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(stat.value, 120, yPos);
+                    doc.setFont('helvetica', 'normal');
+                    yPos += 8;
+                });
+                
+                // Rodapé
+                yPos += 10;
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, yPos, 190, yPos);
+                yPos += 8;
+                
+                doc.setFontSize(9);
+                doc.setTextColor(127, 140, 141);
+                doc.text('Documento gerado automaticamente pelo sistema ClientKey', 20, yPos);
+                doc.text(`ID da Premiação: ${winners.id}`, 20, yPos + 5);
+                
+                // Salvar PDF
+                const fileName = `Premiacao_ClientKey_${now.toISOString().split('T')[0]}_${now.getHours()}h${now.getMinutes()}.pdf`;
+                doc.save(fileName);
+                
+                console.log(`✅ PDF gerado com sucesso: ${fileName}`);
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar PDF:', error);
+                showMessage('Erro ao gerar PDF: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // Função para zerar todos os dados do ranking
+        async function clearAllRankingData() {
+            try {
+                console.log('🗑️ Zerando dados do ranking...');
+
+                // Limpar atividades no Firebase
+                if (typeof window.FirebaseDB.clearAllActivities === 'function') {
+                    await window.FirebaseDB.clearAllActivities();
+                    console.log('✅ Atividades limpas no Firebase');
+                }
+
+                // Limpar dados locais dos clientes
+                if (typeof window.FirebaseDB.getClients === 'function') {
+                    const clients = await window.FirebaseDB.getClients();
+                    clients.forEach(client => {
+                        // Limpar atividades específicas do cliente
+                        localStorage.removeItem(`client_activities_${client.id}`);
+                    });
+                    console.log('✅ Atividades locais dos clientes limpas');
+                }
+
+                // Limpar tentativas de palavras-chave
+                if (typeof window.FirebaseDB.clearUserAttempts === 'function') {
+                    window.FirebaseDB.clearUserAttempts();
+                    console.log('✅ Tentativas de usuários limpas');
+                }
+
+                // Limpar cache local de atividades
+                localStorage.removeItem('recent_activities');
+                localStorage.removeItem('ranking_cache');
+
+                console.log('🎯 Ranking zerado com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao zerar ranking:', error);
+                throw new Error('Falha ao zerar dados do ranking: ' + error.message);
+            }
         }
         
         // Função para gerar relatório PDF
