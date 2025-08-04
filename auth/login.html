@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Administrativo - ClientKey</title>
-    <link rel="stylesheet" href="../assets/css/modern-theme.css">
+    <link rel="stylesheet" href="../assets/css/admin-unified.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -16,25 +16,28 @@
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
+            line-height: 1.6;
         }
         
         .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
             width: 100%;
-            max-width: 450px;
-            padding: 40px;
+            max-width: 550px;
+            padding: var(--spacing-xl);
             position: relative;
             animation: slideUp 0.6s ease-out;
+            backdrop-filter: blur(10px);
         }
         
         @keyframes slideUp {
@@ -50,19 +53,19 @@
         
         .login-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: var(--spacing-xl);
         }
         
         .login-logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background: var(--gradient-primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+            margin: 0 auto var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
         }
         
         .login-logo i {
@@ -71,15 +74,20 @@
         }
         
         .login-title {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-md);
         }
         
         .login-subtitle {
-            color: #7f8c8d;
+            color: var(--text-secondary);
             font-size: 16px;
+            line-height: 1.5;
         }
         
         .login-form {
@@ -87,15 +95,15 @@
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: var(--spacing-lg);
             position: relative;
         }
         
         .form-group label {
             display: block;
-            color: #34495e;
-            font-weight: 500;
-            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
             font-size: 14px;
         }
         
@@ -105,33 +113,39 @@
         
         .form-group input {
             width: 100%;
-            padding: 15px 20px 15px 50px;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
+            padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 50px;
+            background: var(--surface-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
             font-size: 16px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
+            font-family: inherit;
         }
         
         .form-group input:focus {
             outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: var(--primary-color);
+            background: var(--card-bg);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: var(--text-muted);
         }
         
         .form-group .input-icon {
             position: absolute;
             left: 18px;
             top: 50%;
+            color: var(--text-muted);
             transform: translateY(-50%);
-            color: #7f8c8d;
             font-size: 18px;
             transition: color 0.3s ease;
         }
         
         .form-group input:focus + .input-icon {
-            color: #3498db;
+            color: var(--primary-color);
         }
         
         .password-toggle {
@@ -141,21 +155,21 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #7f8c8d;
+            color: var(--text-muted);
             cursor: pointer;
             font-size: 16px;
             transition: color 0.3s ease;
         }
         
         .password-toggle:hover {
-            color: #3498db;
+            color: var(--primary-color);
         }
         
         .remember-forgot {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--spacing-xl);
         }
         
         .remember-me {
@@ -167,18 +181,18 @@
         .remember-me input[type="checkbox"] {
             width: 18px;
             height: 18px;
-            accent-color: #3498db;
+            accent-color: var(--primary-color);
         }
         
         .remember-me label {
             font-size: 14px;
-            color: #7f8c8d;
+            color: var(--text-secondary);
             cursor: pointer;
             margin-bottom: 0;
         }
         
         .forgot-password {
-            color: #3498db;
+            color: var(--primary-color);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -186,27 +200,32 @@
         }
         
         .forgot-password:hover {
-            color: #2980b9;
+            color: var(--primary-dark);
         }
         
         .login-button {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
         }
         
         .login-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+            box-shadow: var(--shadow-lg);
         }
         
         .login-button:active {
@@ -214,9 +233,10 @@
         }
         
         .login-button:disabled {
-            background: #bdc3c7;
+            background: var(--text-muted);
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         
         .login-button .loading-spinner {
@@ -235,53 +255,54 @@
         }
         
         .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
             font-size: 14px;
             display: none;
+            border: 1px solid;
         }
         
         .alert.error {
-            background: #fee;
-            color: #c62828;
-            border: 1px solid #ffcdd2;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-color: rgba(239, 68, 68, 0.2);
         }
         
         .alert.success {
-            background: #e8f5e8;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+            border-color: rgba(16, 185, 129, 0.2);
         }
         
         .alert.info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border: 1px solid #bbdefb;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+            border-color: rgba(37, 99, 235, 0.2);
         }
         
         .demo-credentials {
-            background: #f8f9fa;
-            border: 1px solid #e1e8ed;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 25px;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
         }
         
         .demo-credentials h4 {
-            color: #34495e;
+            color: var(--text-primary);
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: var(--spacing-sm);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-sm);
         }
         
         .demo-credentials .credential-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: var(--spacing-sm);
             font-size: 13px;
         }
         
@@ -290,50 +311,71 @@
         }
         
         .demo-credentials .credential-label {
-            color: #7f8c8d;
+            color: var(--text-secondary);
             font-weight: 500;
         }
         
         .demo-credentials .credential-value {
-            color: #2c3e50;
+            color: var(--text-primary);
             font-family: 'Courier New', monospace;
-            background: white;
+            background: var(--surface-bg);
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             transition: background 0.2s ease;
         }
         
         .demo-credentials .credential-value:hover {
-            background: #ecf0f1;
+            background: var(--hover-bg);
         }
         
         .back-to-site {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8ed;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
         }
         
         .back-to-site a {
-            color: #7f8c8d;
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 14px;
             transition: color 0.3s ease;
         }
         
         .back-to-site a:hover {
-            color: #3498db;
+            color: var(--primary-color);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .login-container {
+                margin: var(--spacing-lg);
+                padding: var(--spacing-lg);
+                max-width: 100%;
+            }
         }
         
         @media (max-width: 480px) {
             .login-container {
-                margin: 20px;
-                padding: 30px 25px;
+                margin: var(--spacing-md);
+                padding: var(--spacing-lg) var(--spacing-md);
             }
             
             .login-title {
                 font-size: 24px;
+            }
+            
+            .form-group input {
+                padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 45px;
+            }
+            
+            .form-group .input-icon {
+                left: 15px;
+            }
+            
+            .password-toggle {
+                right: 15px;
             }
         }
     </style>
@@ -344,7 +386,10 @@
             <div class="login-logo">
                 <i class="fas fa-shield-alt"></i>
             </div>
-            <h1 class="login-title">Área Administrativa</h1>
+            <h1 class="login-title">
+                <i class="fas fa-user-shield"></i>
+                Área Administrativa
+            </h1>
             <p class="login-subtitle">Faça login para acessar o painel</p>
         </div>
         

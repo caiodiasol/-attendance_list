@@ -2049,6 +2049,76 @@
         /**
          * Logout
          */
+        /**
+         * Mostrar diálogo para gerar relatórios PDF
+         */
+        async function showReportsDialog() {
+            try {
+                // Definir datas padrão (últimos 30 dias)
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30);
+                
+                const startDateStr = startDate.toISOString().split('T')[0];
+                const endDateStr = endDate.toISOString().split('T')[0];
+                
+                // Criar formulário usando prompt customizado
+                const userStartDate = prompt(
+                    `Gerar Relatório PDF de Ranking\n\n` +
+                    `Data inicial (formato: YYYY-MM-DD):`, 
+                    startDateStr
+                );
+                
+                if (!userStartDate) return; // Usuário cancelou
+                
+                const userEndDate = prompt(
+                    `Data final (formato: YYYY-MM-DD):`, 
+                    endDateStr
+                );
+                
+                if (!userEndDate) return; // Usuário cancelou
+                
+                // Validar datas
+                if (!userStartDate || !userEndDate) {
+                    showMessage('Por favor, informe as datas inicial e final', 'error');
+                    return;
+                }
+                
+                if (new Date(userStartDate) > new Date(userEndDate)) {
+                    showMessage('A data inicial deve ser anterior à data final', 'error');
+                    return;
+                }
+                
+                // Mostrar mensagem de progresso
+                showMessage('Gerando relatório PDF...', 'info');
+                
+                // Obter dados do período
+                const clients = await window.FirebaseDB.getClients();
+                const activities = await window.FirebaseDB.getAllActivities();
+                
+                // Filtrar atividades por período
+                const filteredActivities = activities.filter(activity => {
+                    const activityDate = new Date(activity.timestamp);
+                    return activityDate >= new Date(userStartDate) && activityDate <= new Date(userEndDate + 'T23:59:59');
+                });
+                
+                if (filteredActivities.length === 0) {
+                    showMessage('Nenhuma atividade encontrada no período selecionado', 'warning');
+                    return;
+                }
+                
+                // Gerar relatórios PDF
+                await generateRankingPDF(clients, filteredActivities, userStartDate, userEndDate);
+                await generateActivitiesPDF(filteredActivities, userStartDate, userEndDate);
+                
+                showMessage('Relatórios PDF gerados com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar relatórios:', error);
+                showMessage('Erro ao gerar relatórios: ' + error.message, 'error');
+            }
+        }
+
         function handleLogout() {
             if (confirm('Deseja realmente sair do sistema?')) {
                 authService.logout();
