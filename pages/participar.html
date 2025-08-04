@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participar da Live - Digite a Palavra-Chave</title>
+    <link rel="stylesheet" href="../assets/css/participar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span class="logo-text">Participação Live</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="cadastro-clientes.html" class="nav-item">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <a href="participar.html" class="nav-item active">
+                        <i class="fas fa-play"></i>
+                        <span>Participar</span>
+                    </a>
+                    <a href="ranking.html" class="nav-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Ver Ranking</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="live-status">
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        <span class="live-text">AO VIVO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="participation-main">
+        <div class="participation-container">
+            <!-- Client Selection Section -->
+            <section id="clientSelectionSection" class="client-selection-section">
+                <div class="selection-card">
+                    <div class="card-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h1>Ganhe prêmios incríveis!</h1>
+                        <p>Digite seu email cadastrado para começar a pontuar</p>
+                    </div>
+                    
+                    <div class="identification-form">
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" 
+                                       id="clientIdentification" 
+                                       placeholder="Digite seu email cadastrado..." 
+                                       autocomplete="email">
+                                <button type="button" id="clearEmailBtn" class="btn-clear-email" onclick="clearSavedEmail()" title="Limpar email salvo">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <button id="identifyBtn" class="btn-identify" disabled>
+                                <i class="fas fa-sign-in-alt"></i>
+                                Entrar
+                            </button>
+                        </div>
+                        
+                        <div id="clientPreview" class="client-preview" style="display: none;">
+                            <i class="fas fa-user-check"></i>
+                            <span id="previewText"></span>
+                        </div>
+                        
+                        <div class="help-text">
+                            <p><i class="fas fa-info-circle"></i> Não tem cadastro? <a href="cadastro-clientes.html">Cadastre-se aqui</a></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Participation Section -->
+            <section id="participationSection" class="participation-section" style="display: none;">
+                <div class="participation-card">
+                    <!-- Client Info Bar -->
+                    <div class="client-info-bar">
+                        <div class="client-details">
+                            <div class="client-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="client-data">
+                                <span class="client-name" id="currentClientName">Cliente</span>
+                                <span class="client-email" id="currentClientEmail">email@exemplo.com</span>
+                            </div>
+                        </div>
+                        <div class="client-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="clientPoints">0</span>
+                                <span class="stat-label">Pontos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="clientPosition">-</span>
+                                <span class="stat-label">Posição</span>
+                            </div>
+                        </div>
+                        <button id="logoutBtn" class="btn-logout" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Keyword Selection Section -->
+                    <div class="keyword-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bullseye"></i> Escolha a Palavra-Chave</h2>
+                            <p>Clique na palavra-chave que foi dita na live para ganhar pontos!</p>
+                        </div>
+                        
+                        <div class="keyword-selection-area">
+                            <div id="keywordButtons" class="keyword-buttons">
+                                <div class="waiting-message">
+                                    <i class="fas fa-clock"></i>
+                                    <p>Aguardando palavra-chave da live...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="keyword-status" id="keywordStatus" style="display: none;">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Palavra-chave enviada com sucesso!</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="todayPoints">0</span>
+                                    <span class="stat-text">Pontos Hoje</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="totalPoints">0</span>
+                                    <span class="stat-text">Total de Pontos</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="lastActivity">-</span>
+                                    <span class="stat-text">Última Atividade</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <div class="activity-header">
+                            <h3><i class="fas fa-history"></i> Suas Últimas Participações</h3>
+                        </div>
+                        <div id="clientActivity" class="activity-list">
+                            <div class="empty-activity">
+                                <i class="fas fa-keyboard"></i>
+                                <p>Nenhuma participação ainda hoje</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Firebase Configuration -->
+    <script type="module" src="../firebase-config.js"></script>
+    <script src="../assets/js/participar.js"></script>
+</body>
+</html>

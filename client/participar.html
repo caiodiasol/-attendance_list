@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participar - ClientKey</title>
+    <link rel="stylesheet" href="../assets/css/modern-theme.css">
+    <link rel="stylesheet" href="../assets/css/participar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Customizações específicas para página de participação */
+        .participate-header {
+            background: var(--gradient-primary);
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+            border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .participate-header h1 {
+            color: white;
+            font-size: 48px;
+            margin-bottom: var(--spacing-lg);
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .participate-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        /* Header styles from ranking */
+        .main-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            color: var(--warning-color);
+            font-size: 24px;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-mini {
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .participation-form {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--card-bg, #1e293b);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color, #475569);
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #f6f7f8;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .keywords-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .keywords-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+        
+        .keywords-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .keyword-button {
+            padding: 18px 35px;
+            background: white;
+            border: 3px solid #e1e8ed;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 140px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .keyword-button:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            background: #f8f9fa;
+        }
+        
+        .keyword-button.selected {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: white;
+        }
+        
+        .keyword-button:disabled {
+            background: #ecf0f1;
+            color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .no-keywords {
+            color: #7f8c8d;
+            font-style: italic;
+            padding: 30px;
+        }
+        
+        .client-info {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .client-info h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .client-info p {
+            color: #388e3c;
+            margin: 5px 0;
+        }
+        
+        .btn-participate {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .btn-participate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-participate:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-message {
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .result-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .result-message.already-tried {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .points-display {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin-right: 10px;
+        }
+        
+        .btn-participate.loading .loading-spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Menu Hambúrguer */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger-menu:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background-color: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-6px, -6px);
+        }
+
+        /* Dropdown menu móvel */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-nav-item:hover {
+            background-color: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .mobile-nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .header-container {
+                position: relative;
+            }
+
+            .stats-mini {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-play"></i>
+                    <span class="logo-text">Live Participação</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="cadastro.html" class="nav-item">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <a href="participar.html" class="nav-item active">
+                        <i class="fas fa-play"></i>
+                        <span>Participar</span>
+                    </a>
+                    <a href="ranking.html" class="nav-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Ranking</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="stat-value" id="userPoints">0</span>
+                        <span class="stat-label">Seus Pontos</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-value" id="totalUsers">0</span>
+                        <span class="stat-label">Participantes</span>
+                    </div>
+                </div>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="cadastro.html" class="mobile-nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Cadastro</span>
+            </a>
+            <a href="participar.html" class="mobile-nav-item active">
+                <i class="fas fa-play"></i>
+                <span>Participar</span>
+            </a>
+            <a href="ranking.html" class="mobile-nav-item">
+                <i class="fas fa-trophy"></i>
+                <span>Ranking</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Header Section -->
+        <header class="client-header">
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 40px 20px;">
+                <h1 style="font-size: 48px; font-weight: 800; color: #f8f9fa; margin-bottom: 20px;">
+                    🏆 Participe da Premiação!
+                </h1>
+                <p style="font-size: 20px; color: #7f8c8d; margin-bottom: 12px; line-height: 1.4;">
+                    Escolha a palavra-chave correta e confirme sua participação pra ganhar pontos no ranking
+                </p>
+                <p style="font-size: 18px; color: #7f8c8d; margin-bottom: 0; line-height: 1.4;">
+                    🔥 Fique atento às dicas durante a transmissão!
+                </p>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Formulário de Participação -->
+            <section class="participation-form">
+                <form id="participationForm">
+                    <div id="clientInfo" class="client-info" style="display: none;">
+                        <h3>
+                            <i class="fas fa-user-check"></i>
+                            Cliente Encontrado
+                        </h3>
+                        <p><strong>Nome:</strong> <span id="clientName">-</span></p>
+                        <p><strong>Email:</strong> <span id="clientEmail">-</span></p>
+                        <p><strong>WhatsApp:</strong> <span id="clientWhatsApp">-</span></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientSearch">
+                            <i class="fas fa-envelope"></i> Digite seu e-mail cadastrado
+                        </label>
+                        <input 
+                            type="email" 
+                            id="clientSearch" 
+                            name="clientSearch" 
+                            placeholder="Digite seu e-mail cadastrado"
+                            required
+                        >
+                    </div>
+
+                    <button type="button" class="btn-participate" id="validateEmailBtn" onclick="validateClientEmail()">
+                        <i class="fas fa-spinner loading-spinner"></i>
+                        <span id="validateEmailText">Validar E-mail</span>
+                    </button>
+                    
+                    <button type="button" class="btn-participate" id="participateBtn" onclick="participateInLive()" style="display: none;">
+                        <i class="fas fa-spinner loading-spinner"></i>
+                        <span id="participateBtnText">Confirmar Participação</span>
+                    </button>
+                </form>
+            </section>
+            
+            <!-- Seção de Palavras-chave -->
+            <section class="keywords-section" id="keywordsSection" style="display: none; margin-top: 40px;">
+                <h2 class="keywords-title">
+                    <i class="fas fa-key"></i>
+                    Escolha a Palavra-chave Correta
+                </h2>
+                
+                <div id="keywordsContainer">
+                    <div class="no-keywords" id="noKeywords">
+                        <i class="fas fa-clock"></i>
+                        <p>Aguarde... As palavras-chave serão disponibilizadas durante a live!</p>
+                    </div>
+                    
+                    <div id="keywordsButtons" class="keywords-buttons" style="display: none;">
+                        <!-- Botões de palavras-chave serão inseridos aqui -->
+                    </div>
+                </div>
+                
+                <div id="resultMessage" class="result-message">
+                    <!-- Mensagem de resultado -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <!-- Database System Scripts -->
+    <script src="../database/connection.js"></script>
+    <script src="../database/models/Client.js"></script>
+    <script src="../database/models/Activity.js"></script>
+    <script src="../database/models/Keyword.js"></script>
+    <script src="../database/services/DatabaseService.js"></script>
+    <script src="../database/services/AuditService.js"></script>
+    <script src="../database/services/ErrorHandler.js"></script>
+    <script src="../database/migration/DataMigration.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="../firebase-config.js"></script>
+    <script src="../assets/js/participar.js"></script>
+    
+    <script>
+        // Variáveis globais específicas para área do cliente
+        let selectedKeyword = null;
+        let currentKeywords = null;
+        let foundClient = null;
+        
+        // Menu hambúrguer
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🌟 Página de participação do cliente carregada');
+            
+            // Inicializar menu hambúrguer
+            initializeHamburgerMenu();
+            
+            // Aguardar o sistema de banco estar disponível
+            console.log('⏳ Aguardando sistema de banco ficar disponível...');
+            let attempts = 0;
+            const maxAttempts = 20;
+            
+            while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                attempts++;
+            }
+            
+            if (typeof window.FirebaseDB !== 'undefined') {
+                console.log('✅ Sistema de banco carregado com sucesso');
+                
+                // Verificar se há estatísticas para exibir
+                updateUserStats();
+            } else {
+                console.log('⚠️ Sistema de banco não carregou completamente');
+            }
+            
+            // Não carregar palavras-chave automaticamente
+            // Elas só serão carregadas após validação do e-mail
+        });
+        
+        /**
+         * Carregar palavras-chave atuais (apenas uma vez após validação)
+         */
+        function loadCurrentKeywords() {
+            try {
+                // Aguardar o sistema FirebaseDB estar disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    console.log('⏳ Sistema de banco ainda não carregado, tentando novamente...');
+                    setTimeout(loadCurrentKeywords, 500);
+                    return;
+                }
+                
+                currentKeywords = window.FirebaseDB.getCurrentKeywords();
+                
+                if (currentKeywords) {
+                    displayKeywords(currentKeywords);
+                } else {
+                    showNoKeywords();
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar palavras-chave:', error);
+                showNoKeywords();
+            }
+        }
+        
+        /**
+         * Exibir palavras-chave
+         */
+        function displayKeywords(keywords) {
+            const noKeywords = document.getElementById('noKeywords');
+            const keywordsButtons = document.getElementById('keywordsButtons');
+            
+            noKeywords.style.display = 'none';
+            keywordsButtons.style.display = 'flex';
+            
+            // Criar botões de palavras-chave
+            const allKeywords = [keywords.correct, ...keywords.incorrect];
+            const shuffledKeywords = shuffleArray([...allKeywords]);
+            
+            keywordsButtons.innerHTML = '';
+            shuffledKeywords.forEach(keyword => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'keyword-button';
+                button.textContent = keyword;
+                button.onclick = () => selectKeyword(keyword, button);
+                keywordsButtons.appendChild(button);
+            });
+        }
+        
+        /**
+         * Mostrar mensagem de sem palavras-chave
+         */
+        function showNoKeywords() {
+            const noKeywords = document.getElementById('noKeywords');
+            const keywordsButtons = document.getElementById('keywordsButtons');
+            
+            noKeywords.style.display = 'block';
+            keywordsButtons.style.display = 'none';
+            
+            // Limpar seleção
+            selectedKeyword = null;
+        }
+        
+        /**
+         * Selecionar palavra-chave
+         */
+        function selectKeyword(keyword, button) {
+            // Remover seleção anterior
+            document.querySelectorAll('.keyword-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Selecionar nova palavra
+            button.classList.add('selected');
+            selectedKeyword = keyword;
+            
+            console.log('🔑 Palavra-chave selecionada:', keyword);
+        }
+        
+        /**
+         * Validar email do cliente
+         */
+        async function validateClientEmail() {
+            const email = document.getElementById('clientSearch').value.trim();
+            
+            if (!email) {
+                showMessage('Por favor, digite seu e-mail', 'error');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showMessage('Por favor, digite um e-mail válido', 'error');
+                return;
+            }
+            
+            try {
+                // Mostrar loading
+                setValidationLoadingState(true);
+                
+                // Aguardar o sistema FirebaseDB estar disponível com timeout
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                    console.log('⏳ Sistema de banco ainda não carregado, aguardando...');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    attempts++;
+                }
+                
+                if (typeof window.FirebaseDB === 'undefined') {
+                    console.log('❌ Sistema de banco não carregou após tentativas');
+                    showMessage('Sistema ainda carregando. Tente novamente em alguns segundos.', 'error');
+                    return;
+                }
+                
+                const client = await window.FirebaseDB.findClientByEmailOrName(email);
+                
+                if (client) {
+                    foundClient = client;
+                    showClientInfo(client);
+                    showKeywordsSection();
+                    loadCurrentKeywords();
+                    updateUserStats(); // Atualizar estatísticas após login
+                    showMessage('E-mail validado com sucesso! Agora escolha a palavra-chave.', 'success');
+                } else {
+                    foundClient = null;
+                    hideClientInfo();
+                    hideKeywordsSection();
+                    showMessage('E-mail não encontrado. Verifique se você já se cadastrou.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao validar e-mail:', error);
+                hideClientInfo();
+                hideKeywordsSection();
+                showMessage('Erro ao validar e-mail. Tente novamente.', 'error');
+            } finally {
+                setValidationLoadingState(false);
+            }
+        }
+        
+        /**
+         * Mostrar informações do cliente
+         */
+        function showClientInfo(client) {
+            const clientInfo = document.getElementById('clientInfo');
+            
+            document.getElementById('clientName').textContent = client.name;
+            document.getElementById('clientEmail').textContent = client.email;
+            document.getElementById('clientWhatsApp').textContent = client.whatsapp || 'Não informado';
+            
+            clientInfo.style.display = 'block';
+        }
+        
+        /**
+         * Esconder informações do cliente
+         */
+        function hideClientInfo() {
+            document.getElementById('clientInfo').style.display = 'none';
+            foundClient = null;
+        }
+        
+        /**
+         * Participar da live
+         */
+        async function participateInLive() {
+            try {
+                // Validações
+                if (!foundClient) {
+                    showMessage('Por favor, valide seu e-mail primeiro', 'error');
+                    return;
+                }
+                
+                if (!selectedKeyword) {
+                    showMessage('Por favor, selecione uma palavra-chave', 'error');
+                    return;
+                }
+                
+                if (!currentKeywords) {
+                    showMessage('Nenhuma palavra-chave ativa no momento', 'error');
+                    return;
+                }
+                
+                // Mostrar loading
+                setLoadingState(true);
+                
+                // Verificar se o sistema está disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco não está disponível. Tente novamente.', 'error');
+                    return;
+                }
+                
+                // Verificar se cliente já tentou
+                const hasAttempted = window.FirebaseDB.hasUserAttempted(
+                    foundClient.email, 
+                    currentKeywords.id
+                );
+                
+                if (hasAttempted) {
+                    const previousAttempt = window.FirebaseDB.getUserAttempt(
+                        foundClient.email, 
+                        currentKeywords.id
+                    );
+                    
+                    showAlreadyAttemptedMessage(previousAttempt);
+                    return;
+                }
+                
+                // Verificar se acertou
+                const isCorrect = selectedKeyword === currentKeywords.correct;
+                const points = isCorrect ? 1 : 0; // Alterado para 1 ponto por acerto
+                
+                // Registrar tentativa
+                window.FirebaseDB.recordUserAttempt(
+                    foundClient.email,
+                    currentKeywords.id,
+                    isCorrect,
+                    selectedKeyword
+                );
+                
+                // Adicionar atividade
+                const activityData = {
+                    clientId: foundClient.id,
+                    type: 'keyword_attempt',
+                    keywordId: currentKeywords.id,
+                    selectedKeyword: selectedKeyword,
+                    correctKeyword: currentKeywords.correct,
+                    isCorrect: isCorrect,
+                    points: points,
+                    details: `${isCorrect ? 'Acertou' : 'Errou'} a palavra-chave: ${selectedKeyword}`
+                };
+                
+                await window.FirebaseDB.addActivity(activityData);
+                
+                // Mostrar resultado
+                showResultMessage(isCorrect, points, currentKeywords.correct);
+                
+                // Desabilitar botões
+                disableKeywordButtons();
+                
+                console.log('✅ Participação registrada:', {
+                    client: foundClient.name,
+                    keyword: selectedKeyword,
+                    correct: isCorrect,
+                    points: points
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro ao participar:', error);
+                showMessage('Erro ao registrar participação. Tente novamente.', 'error');
+                
+            } finally {
+                setLoadingState(false);
+            }
+        }
+        
+        /**
+         * Mostrar mensagem de resultado
+         */
+        function showResultMessage(isCorrect, points, correctKeyword) {
+            const resultMessage = document.getElementById('resultMessage');
+            
+            if (isCorrect) {
+                resultMessage.className = 'result-message success';
+                resultMessage.innerHTML = `
+                    <i class="fas fa-trophy" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h3>🎉 Parabéns! Você Acertou!</h3>
+                    <p>Palavra correta: <strong>${correctKeyword}</strong></p>
+                    <div class="points-display">+${points} pontos</div>
+                    <p style="margin-top: 15px;">Sua participação foi registrada no ranking!</p>
+                `;
+            } else {
+                resultMessage.className = 'result-message error';
+                resultMessage.innerHTML = `
+                    <i class="fas fa-times-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                    <h3>😔 Que pena! Você Errou!</h3>
+                    <p>Você escolheu: <strong>${selectedKeyword}</strong></p>
+                    <p>Palavra correta era: <strong>${correctKeyword}</strong></p>
+                    <div class="points-display">+0 pontos</div>
+                    <p style="margin-top: 15px;">Continue acompanhando para a próxima oportunidade!</p>
+                `;
+            }
+            
+            resultMessage.style.display = 'block';
+            
+            // Scroll para o resultado
+            resultMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        /**
+         * Mostrar mensagem de já tentou
+         */
+        function showAlreadyAttemptedMessage(attempt) {
+            const resultMessage = document.getElementById('resultMessage');
+            
+            resultMessage.className = 'result-message already-tried';
+            resultMessage.innerHTML = `
+                <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <h3>⚠️ Você já Participou!</h3>
+                <p>Sua escolha anterior: <strong>${attempt.selectedWord}</strong></p>
+                <p>Resultado: <strong>${attempt.isCorrect ? 'Correto!' : 'Incorreto'}</strong></p>
+                <p style="margin-top: 15px;">Você só pode participar uma vez por palavra-chave.</p>
+                <p>Aguarde a próxima oportunidade na live!</p>
+            `;
+            
+            resultMessage.style.display = 'block';
+            
+            // Desabilitar botões
+            disableKeywordButtons();
+            
+            // Marcar palavra escolhida anteriormente
+            document.querySelectorAll('.keyword-button').forEach(btn => {
+                if (btn.textContent === attempt.selectedWord) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+        
+        /**
+         * Mostrar seção de palavras-chave
+         */
+        function showKeywordsSection() {
+            document.getElementById('keywordsSection').style.display = 'block';
+            document.getElementById('validateEmailBtn').style.display = 'none';
+            document.getElementById('participateBtn').style.display = 'block';
+        }
+        
+        /**
+         * Esconder seção de palavras-chave
+         */
+        function hideKeywordsSection() {
+            document.getElementById('keywordsSection').style.display = 'none';
+            document.getElementById('validateEmailBtn').style.display = 'block';
+            document.getElementById('participateBtn').style.display = 'none';
+            selectedKeyword = null;
+        }
+        
+        /**
+         * Desabilitar botões de palavras-chave
+         */
+        function disableKeywordButtons() {
+            document.querySelectorAll('.keyword-button').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            document.getElementById('participateBtn').disabled = true;
+        }
+        
+        /**
+         * Configurar estado de loading
+         */
+        function setLoadingState(loading) {
+            const button = document.getElementById('participateBtn');
+            const buttonText = document.getElementById('participateBtnText');
+            
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                buttonText.textContent = 'Processando...';
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                buttonText.textContent = 'Confirmar Participação';
+            }
+        }
+        
+        /**
+         * Configurar estado de loading da validação
+         */
+        function setValidationLoadingState(loading) {
+            const button = document.getElementById('validateEmailBtn');
+            const buttonText = document.getElementById('validateEmailText');
+            
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                buttonText.textContent = 'Validando...';
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                buttonText.textContent = 'Validar E-mail';
+            }
+        }
+        
+        /**
+         * Utilitários
+         */
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        function debounce(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer');
+            
+            if (!messageContainer) {
+                // Fallback: criar container se não existir
+                const container = document.createElement('div');
+                container.id = 'messageContainer';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.cssText = `
+                padding: 12px 16px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideIn 0.3s ease;
+                ${type === 'success' ? 'background: #10b981; color: white;' : ''}
+                ${type === 'error' ? 'background: #ef4444; color: white;' : ''}
+                ${type === 'info' ? 'background: #3b82f6; color: white;' : ''}
+            `;
+            messageDiv.textContent = message;
+            
+            const container = document.getElementById('messageContainer');
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageDiv.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (messageDiv.parentNode) {
+                            container.removeChild(messageDiv);
+                        }
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+        /**
+         * Atualizar estatísticas do usuário no header
+         */
+        async function updateUserStats() {
+            try {
+                if (typeof window.FirebaseDB === 'undefined') {
+                    return;
+                }
+
+                // Atualizar total de participantes
+                const clients = await window.FirebaseDB.getClients();
+                const totalUsersElement = document.getElementById('totalUsers');
+                if (totalUsersElement && clients) {
+                    totalUsersElement.textContent = clients.length;
+                }
+
+                // Se há um usuário logado, atualizar seus pontos
+                if (foundClient) {
+                    const activities = await window.FirebaseDB.getClientActivities(foundClient.id);
+                    if (activities) {
+                        const totalPoints = activities.reduce((sum, activity) => sum + (activity.points || 0), 0);
+                        const userPointsElement = document.getElementById('userPoints');
+                        if (userPointsElement) {
+                            userPointsElement.textContent = totalPoints;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar estatísticas:', error);
+            }
+        }
+    </script>
+</body>
+</html>

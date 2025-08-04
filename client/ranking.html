@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking de Presença - Live Stream Competition</title>
+    <link rel="stylesheet" href="../assets/css/ranking.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Menu Hambúrguer */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger-menu:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background-color: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-6px, -6px);
+        }
+
+        /* Dropdown menu móvel */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-nav-item:hover {
+            background-color: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .mobile-nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Layout Centralizado */
+        .dashboard {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: calc(100vh - 80px);
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .ranking-section-centered {
+            width: 100%;
+            background: var(--card-bg, #1e293b);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color, #475569);
+            padding: 24px;
+        }
+
+        /* Dropdown de Filtros */
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--surface-bg, #334155);
+            color: var(--text-primary, #f8fafc);
+            border: 1px solid var(--border-color, #475569);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 180px;
+            justify-content: space-between;
+        }
+
+        .filter-toggle-btn:hover {
+            background: var(--surface-hover, #3f4652);
+            border-color: var(--primary-color, #2563eb);
+        }
+
+        .filter-toggle-btn i:first-child {
+            color: var(--primary-color, #2563eb);
+        }
+
+        .filter-toggle-btn i:last-child {
+            transition: transform 0.2s ease;
+        }
+
+        .filter-toggle-btn.active i:last-child {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            background: var(--card-bg, #1e293b);
+            border: 1px solid var(--border-color, #475569);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .filter-dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: var(--text-secondary, #cbd5e1);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .filter-option:hover {
+            background: var(--surface-bg, #334155);
+            color: var(--text-primary, #f8fafc);
+        }
+
+        .filter-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .filter-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .filter-option i {
+            color: var(--primary-color, #2563eb);
+            font-size: 12px;
+            width: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .header-container {
+                position: relative;
+            }
+
+            .stats-mini {
+                display: none;
+            }
+
+            .dashboard {
+                padding: 16px;
+                min-height: calc(100vh - 70px);
+            }
+
+            .ranking-section-centered {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .filter-dropdown {
+                width: 100%;
+            }
+
+            .filter-toggle-btn {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .filter-dropdown-menu {
+                left: 0;
+                right: 0;
+                min-width: auto;
+            }
+        }
+
+        /* Medalhas e ranking items */
+        .gold-medal {
+            color: #ffd700;
+        }
+
+        .silver-medal {
+            color: #c0c0c0;
+        }
+
+        .bronze-medal {
+            color: #cd7f32;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--card-bg, #1e293b);
+            border: 1px solid var(--border-color, #475569);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .ranking-item:hover {
+            background: var(--surface-hover, #334155);
+            border-color: var(--primary-color, #2563eb);
+            transform: translateY(-1px);
+        }
+
+        .ranking-item.top-three {
+            background: linear-gradient(135deg, var(--card-bg, #1e293b) 0%, rgba(37, 99, 235, 0.05) 100%);
+            border-color: var(--primary-color, #2563eb);
+        }
+
+        .rank-position {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--surface-bg, #334155);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-primary, #f8fafc);
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .rank-position i {
+            font-size: 24px;
+        }
+
+        .rank-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rank-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary, #f8fafc);
+            margin-bottom: 4px;
+        }
+
+        .rank-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .rank-last-activity {
+            font-size: 13px;
+            color: var(--text-muted, #64748b);
+        }
+
+        .rank-points {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color, #2563eb);
+            margin-left: 16px;
+            flex-shrink: 0;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary, #cbd5e1);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--text-muted, #64748b);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary, #f8fafc);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: var(--text-muted, #64748b);
+        }
+
+        /* Responsividade para ranking items */
+        @media (max-width: 768px) {
+            .ranking-item {
+                padding: 12px;
+            }
+
+            .rank-position {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                margin-right: 12px;
+            }
+
+            .rank-position i {
+                font-size: 20px;
+            }
+
+            .rank-name {
+                font-size: 15px;
+            }
+
+            .rank-details {
+                font-size: 12px;
+            }
+
+            .rank-points {
+                font-size: 16px;
+                margin-left: 12px;
+            }
+
+            .rank-details {
+                gap: 2px;
+                margin-top: 2px;
+            }
+
+            .rank-last-activity {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-trophy"></i>
+                    <span class="logo-text">Live Ranking</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="cadastro.html" class="nav-item">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <a href="participar.html" class="nav-item">
+                        <i class="fas fa-play"></i>
+                        <span>Participar</span>
+                    </a>
+                    <a href="ranking.html" class="nav-item active">
+                        <i class="fas fa-trophy"></i>
+                        <span>Ranking</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="stat-value" id="totalPoints">0</span>
+                        <span class="stat-label">Pontos Hoje</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-value" id="activeParticipants">0</span>
+                        <span class="stat-label">Participantes</span>
+                    </div>
+                </div>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="cadastro.html" class="mobile-nav-item">
+                <i class="fas fa-user-plus"></i>
+                <span>Cadastro</span>
+            </a>
+            <a href="participar.html" class="mobile-nav-item">
+                <i class="fas fa-play"></i>
+                <span>Participar</span>
+            </a>
+            <a href="ranking.html" class="mobile-nav-item active">
+                <i class="fas fa-trophy"></i>
+                <span>Ranking</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Ranking Section Centralizada -->
+            <section class="ranking-section-centered">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Ranking de Presença</h2>
+                    <div class="filter-dropdown">
+                        <button id="filterToggle" class="filter-toggle-btn" onclick="toggleFilterDropdown()">
+                            <i class="fas fa-filter"></i>
+                            <span id="currentFilterText">Ranking Geral</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="filterDropdown" class="filter-dropdown-menu">
+                            <button class="filter-option" onclick="selectFilter('all', 'Ranking Geral')">
+                                <i class="fas fa-list"></i>
+                                Ranking Geral
+                            </button>
+                            <button class="filter-option" onclick="selectFilter('day', 'Hoje')">
+                                <i class="fas fa-calendar-day"></i>
+                                Hoje
+                            </button>
+                            <button class="filter-option" onclick="selectFilter('week', 'Semana')">
+                                <i class="fas fa-calendar-week"></i>
+                                Semana
+                            </button>
+                            <button class="filter-option" onclick="selectFilter('month', 'Mês')">
+                                <i class="fas fa-calendar-alt"></i>
+                                Mês
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                    
+                    
+                    <div class="ranking-container">
+                        <!-- Top 3 Podium -->
+                        <div id="podium" class="podium" style="display: none;">
+                            <div class="podium-place second">
+                                <div class="podium-avatar">
+                                    <span class="position">2</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-2-name">-</div>
+                                    <div class="podium-points" id="podium-2-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar second-bar"></div>
+                            </div>
+                            
+                            <div class="podium-place first">
+                                <div class="podium-crown">👑</div>
+                                <div class="podium-avatar winner">
+                                    <span class="position">1</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-1-name">-</div>
+                                    <div class="podium-points" id="podium-1-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar first-bar"></div>
+                            </div>
+                            
+                            <div class="podium-place third">
+                                <div class="podium-avatar">
+                                    <span class="position">3</span>
+                                </div>
+                                <div class="podium-info">
+                                    <div class="podium-name" id="podium-3-name">-</div>
+                                    <div class="podium-points" id="podium-3-points">0 pts</div>
+                                </div>
+                                <div class="podium-bar third-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Full Ranking List -->
+                        <div class="ranking-list-container">
+                            <div id="rankingList" class="ranking-list">
+                                <div class="empty-state">
+                                    <i class="fas fa-trophy"></i>
+                                    <h3>Nenhum ponto adicionado ainda</h3>
+                                    <p>Comece adicionando palavras-chave para ver o ranking!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Firebase Configuration -->
+    <script type="module" src="../firebase-config.js"></script>
+    <!-- <script src="../assets/js/ranking.js"></script> --> <!-- Desabilitado para evitar conflitos -->
+    
+    <script>
+        // Variáveis globais
+        let currentFilter = 'all';
+        let allRankingData = [];
+        let isLoading = false;
+        let rankingCache = {};
+
+        // Menu hambúrguer
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Toggle do dropdown de filtros
+        function toggleFilterDropdown() {
+            const dropdown = document.getElementById('filterDropdown');
+            const toggleBtn = document.getElementById('filterToggle');
+            
+            dropdown.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+        }
+
+        // Selecionar filtro
+        async function selectFilter(period, displayName) {
+            console.log(`Selecionando filtro: ${period} (${displayName})`);
+            
+            currentFilter = period;
+            
+            // Atualizar texto do botão
+            document.getElementById('currentFilterText').textContent = displayName;
+            
+            // Fechar dropdown
+            document.getElementById('filterDropdown').classList.remove('active');
+            document.getElementById('filterToggle').classList.remove('active');
+            
+            // Carregar dados do ranking
+            await filterRanking(period);
+        }
+
+        // Filtrar ranking por período (função interna)
+        async function filterRanking(period) {
+            // Evitar múltiplas chamadas simultâneas
+            if (isLoading) {
+                console.log('Já está carregando dados, ignorando nova chamada');
+                return;
+            }
+            
+            try {
+                isLoading = true;
+                console.log(`Carregando ranking para período: ${period}`);
+                
+                // Aguardar sistema estar disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    console.log('Sistema ainda carregando...');
+                    isLoading = false;
+                    setTimeout(() => filterRanking(period), 500);
+                    return;
+                }
+                
+                // Verificar cache primeiro (válido por 2 minutos)
+                const now = Date.now();
+                if (rankingCache[period] && (now - rankingCache[period].timestamp < 120000)) {
+                    console.log(`Usando dados em cache para: ${period}`);
+                    updateRankingDisplay(rankingCache[period].data);
+                    updateHeaderStats(rankingCache[period].data, period);
+                    isLoading = false;
+                    return;
+                }
+                
+                // Obter dados do ranking filtrado
+                const rankingData = await window.FirebaseDB.getRankingData(period);
+                
+                // Salvar no cache
+                rankingCache[period] = {
+                    data: rankingData,
+                    timestamp: now
+                };
+                
+                console.log(`Dados carregados para ${period}:`, rankingData.length, 'participantes');
+                
+                // Atualizar display
+                updateRankingDisplay(rankingData);
+                updateHeaderStats(rankingData, period);
+                
+            } catch (error) {
+                console.error('Erro ao filtrar ranking:', error);
+                showMessage('Erro ao carregar dados do ranking', 'error');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('filterDropdown');
+            const toggleBtn = document.getElementById('filterToggle');
+            
+            if (dropdown && toggleBtn && 
+                !dropdown.contains(event.target) && 
+                !toggleBtn.contains(event.target)) {
+                dropdown.classList.remove('active');
+                toggleBtn.classList.remove('active');
+            }
+        });
+
+        // Atualizar display do ranking
+        function updateRankingDisplay(rankingData) {
+            const podium = document.getElementById('podium');
+            const rankingList = document.getElementById('rankingList');
+            
+            console.log('Atualizando display com', rankingData?.length || 0, 'participantes');
+            
+            if (!rankingData || rankingData.length === 0) {
+                // Mostrar estado vazio
+                if (podium) podium.style.display = 'none';
+                if (rankingList) {
+                    rankingList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-trophy"></i>
+                            <h3>Nenhum ponto no período selecionado</h3>
+                            <p>Não há atividades registradas para este período.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            // Salvar dados atuais para evitar perda
+            allRankingData = rankingData;
+
+            // Atualizar pódio (top 3)
+            if (rankingData.length >= 3 && podium) {
+                podium.style.display = 'flex';
+                
+                // 1º lugar
+                const podium1Name = document.getElementById('podium-1-name');
+                const podium1Points = document.getElementById('podium-1-points');
+                if (podium1Name && podium1Points) {
+                    podium1Name.textContent = rankingData[0].client.name;
+                    podium1Points.textContent = `${rankingData[0].points} pts`;
+                }
+                
+                // 2º lugar
+                const podium2Name = document.getElementById('podium-2-name');
+                const podium2Points = document.getElementById('podium-2-points');
+                if (podium2Name && podium2Points) {
+                    podium2Name.textContent = rankingData[1].client.name;
+                    podium2Points.textContent = `${rankingData[1].points} pts`;
+                }
+                
+                // 3º lugar
+                const podium3Name = document.getElementById('podium-3-name');
+                const podium3Points = document.getElementById('podium-3-points');
+                if (podium3Name && podium3Points) {
+                    podium3Name.textContent = rankingData[2].client.name;
+                    podium3Points.textContent = `${rankingData[2].points} pts`;
+                }
+            } else if (podium) {
+                podium.style.display = 'none';
+            }
+
+            // Atualizar lista completa
+            if (rankingList) {
+                rankingList.innerHTML = rankingData.map((entry, index) => {
+                    const medalIcon = getMedalIcon(entry.position);
+                    const lastActivityDate = new Date(entry.lastActivity);
+                    
+                    return `
+                        <div class="ranking-item ${entry.position <= 3 ? 'top-three' : ''}">
+                            <div class="rank-position">
+                                ${medalIcon ? `<i class="${medalIcon}"></i>` : entry.position}
+                            </div>
+                            <div class="rank-info">
+                                <div class="rank-name">${escapeHtml(entry.client.name)}</div>
+                                <div class="rank-details">
+                                    <span class="rank-last-activity">
+                                        Última atividade: ${lastActivityDate.toLocaleString('pt-BR')}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="rank-points">${entry.points} pts</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            console.log('Display atualizado com sucesso');
+        }
+
+        // Função para escapar HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Obter ícone da medalha
+        function getMedalIcon(position) {
+            switch (position) {
+                case 1: return 'fas fa-medal gold-medal';
+                case 2: return 'fas fa-medal silver-medal';
+                case 3: return 'fas fa-medal bronze-medal';
+                default: return null;
+            }
+        }
+
+        // Atualizar estatísticas do header
+        function updateHeaderStats(rankingData, period) {
+            const totalPoints = rankingData.reduce((sum, entry) => sum + entry.points, 0);
+            const activeParticipants = rankingData.length;
+            
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('activeParticipants').textContent = activeParticipants;
+            
+            // Atualizar label baseado no período
+            const labels = document.querySelectorAll('.stat-label');
+            labels.forEach(label => {
+                if (label.textContent.includes('Pontos')) {
+                    switch (period) {
+                        case 'all':
+                            label.textContent = 'Pontos Totais';
+                            break;
+                        case 'day':
+                            label.textContent = 'Pontos Hoje';
+                            break;
+                        case 'week':
+                            label.textContent = 'Pontos da Semana';
+                            break;
+                        case 'month':
+                            label.textContent = 'Pontos do Mês';
+                            break;
+                    }
+                }
+            });
+        }
+
+        // Mostrar mensagens
+        function showMessage(message, type = 'info') {
+            if (typeof window.showMessage === 'function') {
+                window.showMessage(message, type);
+            } else {
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
+        }
+
+        // Proteger dados de interferência externa
+        function protectRankingData() {
+            // Evitar que outros scripts sobrescrevam nossos dados
+            const originalRankingList = document.getElementById('rankingList');
+            if (originalRankingList) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        // Se o conteúdo foi limpo por script externo, restaurar
+                        if (originalRankingList.innerHTML.trim() === '' && allRankingData.length > 0) {
+                            console.log('Conteúdo foi limpo externamente, restaurando...');
+                            updateRankingDisplay(allRankingData);
+                        }
+                    });
+                });
+
+                observer.observe(originalRankingList, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Página de ranking carregada');
+            
+            // Inicializar menu hambúrguer
+            initializeHamburgerMenu();
+            
+            // Ativar proteção dos dados
+            protectRankingData();
+            
+            // Aguardar sistema de banco
+            let attempts = 0;
+            const maxAttempts = 20;
+            
+            while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                attempts++;
+            }
+            
+            if (typeof window.FirebaseDB !== 'undefined') {
+                console.log('Sistema de banco carregado, iniciando ranking geral');
+                // Carregar ranking inicial (geral/todos)
+                await filterRanking('all');
+                
+                // Definir intervalo para re-aplicar dados se necessário (backup)
+                setInterval(() => {
+                    if (allRankingData.length > 0) {
+                        const rankingList = document.getElementById('rankingList');
+                        if (rankingList && rankingList.innerHTML.trim() === '') {
+                            console.log('Dados perdidos, restaurando...');
+                            updateRankingDisplay(allRankingData);
+                        }
+                    }
+                }, 5000);
+                
+            } else {
+                console.error('Sistema de banco não carregou');
+                showMessage('Erro ao carregar sistema de banco de dados', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

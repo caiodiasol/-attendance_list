@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Usuários - ClientKey Admin</title>
+    <link rel="stylesheet" href="../assets/css/admin-unified.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Logout button override */
+        .logout-btn {
+            background: var(--gradient-danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .user-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .user-card.current-user {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+        }
+        
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-card-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-card-avatar.admin {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        }
+        
+        .user-card-avatar.moderator {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .user-info-text h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .user-info-text p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 2px 0;
+        }
+        
+        .user-details {
+            margin-bottom: 20px;
+        }
+        
+        .user-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .user-detail-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .user-detail-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .role-badge.super_admin {
+            background: #8e44ad;
+            color: white;
+        }
+        
+        .role-badge.moderator {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .status-badge.active {
+            background: #e8f5e8;
+            color: #27ae60;
+        }
+        
+        .status-badge.inactive {
+            background: #fee;
+            color: #e74c3c;
+        }
+        
+        .permissions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .permission-badge {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .user-actions button {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        
+        .btn-toggle {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-toggle:hover {
+            background: #e67e22;
+        }
+        
+        .add-user-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .add-user-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(39, 174, 96, 0.4);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-header h2 {
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .modal-actions button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Administrativo -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="logo-text">Painel Admin</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="dashboard.html" class="nav-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="users.html" class="nav-item active">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Usuários</span>
+                    </a>
+                    <a href="clients.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="audit-logs.html" class="nav-item">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Logs</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Carregando...</div>
+                        <div class="user-role" id="userRole"></div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="dashboard.html" class="mobile-nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="users.html" class="mobile-nav-item active">
+                <i class="fas fa-users-cog"></i>
+                <span>Usuários</span>
+            </a>
+            <a href="clients.html" class="mobile-nav-item">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="audit-logs.html" class="mobile-nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Logs</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Header Section -->
+            <section class="modern-card">
+                <div class="modern-card-header">
+                    <h2><i class="fas fa-users-cog"></i> Gerenciar Usuários</h2>
+                    <p>Adicione, edite ou remova usuários administrativos do sistema</p>
+                </div>
+            </section>
+
+            <!-- Lista de Usuários -->
+            <section class="modern-card">
+                <div class="modern-card-header">
+                    <h2><i class="fas fa-users-cog"></i> Usuários Administrativos</h2>
+                    <p>Gerencie as contas de administradores e moderadores</p>
+                </div>
+                
+                <div class="modern-card-content">
+                    <div class="users-grid" id="usersGrid">
+                        <!-- Usuários serão carregados aqui -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Botão de Adicionar Usuário -->
+    <button class="add-user-btn" onclick="openAddUserModal()" title="Adicionar novo usuário">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal de Adicionar/Editar Usuário -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Usuário</h2>
+                <button class="close-btn" onclick="closeUserModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="userForm">
+                <input type="hidden" id="userId" name="userId">
+                
+                <div class="form-group">
+                    <label for="username">Nome de Usuário</label>
+                    <input type="text" id="username" name="username" required placeholder="Digite o nome de usuário">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required placeholder="Digite o e-mail">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Digite a senha (deixe vazio para manter atual)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Função</label>
+                    <select id="role" name="role" required onchange="updatePermissions()">
+                        <option value="">Selecione uma função</option>
+                        <option value="super_admin">Super Administrador</option>
+                        <option value="moderator">Moderador</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Permissões</label>
+                    <div class="checkbox-group" id="permissionsGroup">
+                        <!-- Permissões serão carregadas aqui -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="active" name="active" checked>
+                        <label for="active">Usuário ativo</label>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeUserModal()">Cancelar</button>
+                <button type="button" class="btn-save" onclick="saveUser()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Scripts de Autenticação -->
+    <script src="../auth/AuthService.js"></script>
+    <script src="../auth/RouteGuard.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let editingUserId = null;
+        const availablePermissions = [
+            { key: 'all', name: 'Todas as permissões' },
+            { key: 'view_dashboard', name: 'Visualizar dashboard' },
+            { key: 'manage_users', name: 'Gerenciar usuários' },
+            { key: 'view_reports', name: 'Visualizar relatórios' },
+            { key: 'export_data', name: 'Exportar dados' },
+            { key: 'manage_keywords', name: 'Gerenciar palavras-chave' },
+            { key: 'manage_system', name: 'Gerenciar sistema' },
+            { key: 'view_logs', name: 'Visualizar logs' }
+        ];
+        
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando página de usuários...');
+            
+            // Verificar autenticação e permissão
+            if (!authService.isAuthenticated()) {
+                authService.redirectToLogin();
+                return;
+            }
+            
+            if (!authService.hasPermission('manage_users') && !authService.hasPermission('all')) {
+                authService.showAccessDenied();
+                return;
+            }
+            
+            // Carregar informações do usuário atual
+            loadCurrentUserInfo();
+            
+            // Inicializar menu hambúrguer
+            initializeHamburgerMenu();
+            
+            // Carregar lista de usuários
+            loadUsers();
+            
+            // Configurar permissões no modal
+            setupPermissionsCheckboxes();
+        });
+        
+        /**
+         * Carregar informações do usuário atual
+         */
+        function loadCurrentUserInfo() {
+            const user = authService.getCurrentUser();
+            if (user) {
+                document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+                document.getElementById('userName').textContent = user.username;
+                document.getElementById('userRole').textContent = user.role.replace('_', ' ').toUpperCase();
+            }
+        }
+        
+        /**
+         * Carregar lista de usuários
+         */
+        function loadUsers() {
+            try {
+                const users = authService.getAdminUsers();
+                const currentUser = authService.getCurrentUser();
+                const usersGrid = document.getElementById('usersGrid');
+                
+                if (users.length === 0) {
+                    usersGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                            <i class="fas fa-users" style="font-size: 48px; color: #bdc3c7; margin-bottom: 20px;"></i>
+                            <h3 style="color: #7f8c8d;">Nenhum usuário encontrado</h3>
+                            <p style="color: #95a5a6;">Clique no botão + para adicionar o primeiro usuário</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                usersGrid.innerHTML = '';
+                
+                users.forEach(user => {
+                    const isCurrentUser = currentUser && currentUser.userId === user.id;
+                    const userCard = createUserCard(user, isCurrentUser);
+                    usersGrid.appendChild(userCard);
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar usuários:', error);
+                showMessage('Erro ao carregar usuários', 'error');
+            }
+        }
+        
+        /**
+         * Criar card de usuário
+         */
+        function createUserCard(user, isCurrentUser) {
+            const card = document.createElement('div');
+            card.className = `user-card ${isCurrentUser ? 'current-user' : ''}`;
+            
+            const lastLoginText = user.lastLogin 
+                ? new Date(user.lastLogin).toLocaleDateString('pt-BR')
+                : 'Nunca';
+            
+            const createdAtText = new Date(user.createdAt).toLocaleDateString('pt-BR');
+            
+            card.innerHTML = `
+                <div class="user-header">
+                    <div class="user-card-avatar ${user.role}">
+                        ${user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="user-info-text">
+                        <h3>
+                            ${user.username}
+                            ${isCurrentUser ? '<i class="fas fa-crown" style="color: #f1c40f; margin-left: 8px;" title="Você"></i>' : ''}
+                        </h3>
+                        <p>${user.email}</p>
+                        <p>
+                            <span class="role-badge ${user.role}">${user.role.replace('_', ' ')}</span>
+                            <span class="status-badge ${user.active ? 'active' : 'inactive'}">
+                                ${user.active ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="user-details">
+                    <div class="user-detail-item">
+                        <span class="user-detail-label">Criado em:</span>
+                        <span class="user-detail-value">${createdAtText}</span>
+                    </div>
+                    <div class="user-detail-item">
+                        <span class="user-detail-label">Último login:</span>
+                        <span class="user-detail-value">${lastLoginText}</span>
+                    </div>
+                    <div class="user-detail-item">
+                        <span class="user-detail-label">Permissões:</span>
+                        <div class="permissions-list">
+                            ${user.permissions.map(permission => 
+                                `<span class="permission-badge">${permission}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="user-actions">
+                    <button class="btn-edit" onclick="editUser('${user.id}')" title="Editar usuário">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn-toggle" onclick="toggleUserStatus('${user.id}')" title="${user.active ? 'Desativar' : 'Ativar'} usuário">
+                        <i class="fas fa-${user.active ? 'pause' : 'play'}"></i> ${user.active ? 'Desativar' : 'Ativar'}
+                    </button>
+                    ${!isCurrentUser ? `
+                        <button class="btn-delete" onclick="deleteUser('${user.id}')" title="Excluir usuário">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        /**
+         * Configurar checkboxes de permissões
+         */
+        function setupPermissionsCheckboxes() {
+            const permissionsGroup = document.getElementById('permissionsGroup');
+            permissionsGroup.innerHTML = '';
+            
+            availablePermissions.forEach(permission => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="perm_${permission.key}" name="permissions" value="${permission.key}">
+                    <label for="perm_${permission.key}">${permission.name}</label>
+                `;
+                
+                permissionsGroup.appendChild(checkboxItem);
+            });
+        }
+        
+        /**
+         * Abrir modal de adicionar usuário
+         */
+        function openAddUserModal() {
+            editingUserId = null;
+            document.getElementById('modalTitle').textContent = 'Adicionar Usuário';
+            document.getElementById('userForm').reset();
+            document.getElementById('password').required = true;
+            
+            // Limpar permissões
+            document.querySelectorAll('input[name="permissions"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            document.getElementById('userModal').classList.add('show');
+        }
+        
+        /**
+         * Editar usuário
+         */
+        function editUser(userId) {
+            const users = authService.getAdminUsers();
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) {
+                showMessage('Usuário não encontrado', 'error');
+                return;
+            }
+            
+            editingUserId = userId;
+            document.getElementById('modalTitle').textContent = 'Editar Usuário';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('password').value = '';
+            document.getElementById('password').required = false;
+            document.getElementById('role').value = user.role;
+            document.getElementById('active').checked = user.active;
+            
+            // Marcar permissões
+            document.querySelectorAll('input[name="permissions"]').forEach(checkbox => {
+                checkbox.checked = user.permissions.includes(checkbox.value);
+            });
+            
+            document.getElementById('userModal').classList.add('show');
+        }
+        
+        /**
+         * Fechar modal
+         */
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('show');
+            editingUserId = null;
+        }
+        
+        /**
+         * Atualizar permissões baseado na role
+         */
+        function updatePermissions() {
+            const role = document.getElementById('role').value;
+            const checkboxes = document.querySelectorAll('input[name="permissions"]');
+            
+            // Limpar todas as permissões
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Definir permissões baseado na role
+            if (role === 'super_admin') {
+                document.querySelector('input[value="all"]').checked = true;
+                // Desabilitar outros checkboxes quando "all" está selecionado
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.value !== 'all') {
+                        checkbox.disabled = true;
+                    }
+                });
+            } else if (role === 'moderator') {
+                // Habilitar todos os checkboxes
+                checkboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+                
+                // Selecionar permissões padrão para moderador
+                ['view_dashboard', 'manage_keywords', 'view_reports'].forEach(permission => {
+                    const checkbox = document.querySelector(`input[value="${permission}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            } else {
+                // Habilitar todos os checkboxes para seleção manual
+                checkboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+            }
+        }
+        
+        /**
+         * Salvar usuário
+         */
+        async function saveUser() {
+            try {
+                const form = document.getElementById('userForm');
+                const formData = new FormData(form);
+                
+                const username = formData.get('username').trim();
+                const email = formData.get('email').trim();
+                const password = formData.get('password');
+                const role = formData.get('role');
+                const active = document.getElementById('active').checked;
+                
+                // Validações
+                if (!username || !email || !role) {
+                    showMessage('Todos os campos obrigatórios devem ser preenchidos', 'error');
+                    return;
+                }
+                
+                if (!editingUserId && !password) {
+                    showMessage('Senha é obrigatória para novos usuários', 'error');
+                    return;
+                }
+                
+                // Coletar permissões selecionadas
+                const permissions = [];
+                document.querySelectorAll('input[name="permissions"]:checked').forEach(checkbox => {
+                    permissions.push(checkbox.value);
+                });
+                
+                if (permissions.length === 0) {
+                    showMessage('Selecione pelo menos uma permissão', 'error');
+                    return;
+                }
+                
+                const userData = {
+                    username,
+                    email,
+                    role,
+                    permissions,
+                    active
+                };
+                
+                if (password) {
+                    userData.password = authService.hashPassword(password);
+                }
+                
+                const users = authService.getAdminUsers();
+                
+                if (editingUserId) {
+                    // Atualizar usuário existente
+                    const userIndex = users.findIndex(u => u.id === editingUserId);
+                    if (userIndex !== -1) {
+                        users[userIndex] = {
+                            ...users[userIndex],
+                            ...userData,
+                            updatedAt: new Date().toISOString()
+                        };
+                    }
+                } else {
+                    // Verificar se username ou email já existem
+                    const existingUser = users.find(u => 
+                        u.username === username || u.email === email
+                    );
+                    
+                    if (existingUser) {
+                        showMessage('Nome de usuário ou e-mail já existe', 'error');
+                        return;
+                    }
+                    
+                    // Criar novo usuário
+                    const newUser = {
+                        id: `admin_${Date.now()}`,
+                        ...userData,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: null
+                    };
+                    
+                    users.push(newUser);
+                }
+                
+                // Salvar usuários
+                localStorage.setItem(authService.ADMIN_USERS_KEY, JSON.stringify(users));
+                
+                // Log da atividade
+                authService.logActivity(editingUserId ? 'user_updated' : 'user_created', {
+                    targetUserId: editingUserId || userData.id,
+                    targetUsername: username,
+                    role: role
+                });
+                
+                showMessage(
+                    editingUserId ? 'Usuário atualizado com sucesso!' : 'Usuário criado com sucesso!', 
+                    'success'
+                );
+                
+                closeUserModal();
+                loadUsers();
+                
+            } catch (error) {
+                console.error('❌ Erro ao salvar usuário:', error);
+                showMessage('Erro ao salvar usuário', 'error');
+            }
+        }
+        
+        /**
+         * Alternar status do usuário
+         */
+        function toggleUserStatus(userId) {
+            try {
+                const users = authService.getAdminUsers();
+                const userIndex = users.findIndex(u => u.id === userId);
+                
+                if (userIndex === -1) {
+                    showMessage('Usuário não encontrado', 'error');
+                    return;
+                }
+                
+                const user = users[userIndex];
+                const newStatus = !user.active;
+                
+                if (confirm(`Deseja ${newStatus ? 'ativar' : 'desativar'} o usuário ${user.username}?`)) {
+                    users[userIndex].active = newStatus;
+                    users[userIndex].updatedAt = new Date().toISOString();
+                    
+                    localStorage.setItem(authService.ADMIN_USERS_KEY, JSON.stringify(users));
+                    
+                    authService.logActivity('user_status_changed', {
+                        targetUserId: userId,
+                        targetUsername: user.username,
+                        newStatus: newStatus
+                    });
+                    
+                    showMessage(
+                        `Usuário ${newStatus ? 'ativado' : 'desativado'} com sucesso!`, 
+                        'success'
+                    );
+                    
+                    loadUsers();
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao alterar status:', error);
+                showMessage('Erro ao alterar status do usuário', 'error');
+            }
+        }
+        
+        /**
+         * Excluir usuário
+         */
+        function deleteUser(userId) {
+            try {
+                const users = authService.getAdminUsers();
+                const user = users.find(u => u.id === userId);
+                
+                if (!user) {
+                    showMessage('Usuário não encontrado', 'error');
+                    return;
+                }
+                
+                if (confirm(`Deseja realmente excluir o usuário ${user.username}?\n\nEsta ação não pode ser desfeita.`)) {
+                    const filteredUsers = users.filter(u => u.id !== userId);
+                    localStorage.setItem(authService.ADMIN_USERS_KEY, JSON.stringify(filteredUsers));
+                    
+                    authService.logActivity('user_deleted', {
+                        targetUserId: userId,
+                        targetUsername: user.username,
+                        role: user.role
+                    });
+                    
+                    showMessage('Usuário excluído com sucesso!', 'success');
+                    loadUsers();
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao excluir usuário:', error);
+                showMessage('Erro ao excluir usuário', 'error');
+            }
+        }
+        
+        /**
+         * Logout
+         */
+        function handleLogout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                authService.logout();
+                window.location.href = '../auth/login.html';
+            }
+        }
+        
+        /**
+         * Inicializar menu hambúrguer
+         */
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        /**
+         * Mostrar mensagem
+         */
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer') || document.body;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageContainer.removeChild(messageDiv);
+                }
+            }, 4000);
+        }
+        
+        // Event listeners
+        document.addEventListener('click', function(e) {
+            if (e.target === document.getElementById('userModal')) {
+                closeUserModal();
+            }
+        });
+        
+        // Monitorar mudança na permissão "all"
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'permissions' && e.target.value === 'all') {
+                const allCheckbox = e.target;
+                const otherCheckboxes = document.querySelectorAll('input[name="permissions"]:not([value="all"])');
+                
+                if (allCheckbox.checked) {
+                    otherCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.disabled = true;
+                    });
+                } else {
+                    otherCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = false;
+                    });
+                }
+            }
+        });
+        
+    </script>
+</body>
+</html>

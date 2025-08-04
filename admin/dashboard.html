@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrativo - ClientKey</title>
+    <link rel="stylesheet" href="../assets/css/admin-unified.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Logout button override */
+        .logout-btn {
+            background: var(--gradient-danger);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Award confirmation modal styles */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-2xl);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .close {
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+        
+        .close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: var(--spacing-lg);
+        }
+        
+        /* Use unified stats grid */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .admin-stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .admin-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .admin-stat-card h3 {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .admin-stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .admin-stat-card .stat-change {
+            font-size: 14px;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .quick-action-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border-color);
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .quick-action-card i {
+            font-size: 36px;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .quick-action-card h4 {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .quick-action-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .activity-log {
+            background: var(--card-bg);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+        
+        .activity-log h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .activity-icon.login {
+            background: #27ae60;
+        }
+        
+        .activity-icon.logout {
+            background: #e74c3c;
+        }
+        
+        .activity-icon.action {
+            background: #3498db;
+        }
+        
+        .activity-details h4 {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .activity-details p {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .activity-time {
+            margin-left: auto;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+        
+        .permission-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin: 2px;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .role-badge.super_admin {
+            background: #8e44ad;
+        }
+        
+        .role-badge.moderator {
+            background: #f39c12;
+        }
+        
+        /* Estilos para seção de palavras-chave administrativas */
+        .keywords-admin-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .no-keywords-admin {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .no-keywords-admin i {
+            font-size: 48px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+        
+        .no-keywords-admin p {
+            margin: 10px 0;
+        }
+        
+        .no-keywords-admin .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .keywords-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .keyword-info {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .keyword-info h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .current-word {
+            font-size: 32px;
+            font-weight: 700;
+            color: #27ae60;
+            background: #e8f5e8;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #c8e6c9;
+        }
+        
+        .keyword-details {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .keyword-details span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .keywords-preview {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .keywords-preview h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .preview-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .preview-option {
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-option.correct {
+            background: #e8f5e8;
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+        
+        .preview-option.incorrect {
+            background: #f8f9fa;
+            border-color: #e1e8ed;
+            color: #7f8c8d;
+        }
+        
+        .keywords-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-generate,
+        .btn-clear,
+        .btn-attempts {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-generate {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-generate:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+        }
+        
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-attempts {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-attempts:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .keyword-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .keywords-display {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .keywords-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-generate,
+            .btn-clear,
+            .btn-attempts {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Administrativo -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="logo-text">Painel Admin</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="dashboard.html" class="nav-item active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Usuários</span>
+                    </a>
+                    <a href="clients.html" class="nav-item">
+                        <i class="fas fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                    <a href="audit-logs.html" class="nav-item">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Logs</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Carregando...</div>
+                        <div class="user-role" id="userRole"></div>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="dashboard.html" class="mobile-nav-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="users.html" class="mobile-nav-item">
+                <i class="fas fa-users-cog"></i>
+                <span>Usuários</span>
+            </a>
+            <a href="clients.html" class="mobile-nav-item">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="audit-logs.html" class="mobile-nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Logs</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Estatísticas Administrativas -->
+            <section class="admin-stats">
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-users"></i> Total de Clientes</h3>
+                    <div class="stat-value" id="totalClients">0</div>
+                    <div class="stat-change">+12% este mês</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-user-shield"></i> Administradores</h3>
+                    <div class="stat-value" id="totalAdmins">0</div>
+                    <div class="stat-change">2 ativos</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-key"></i> Palavras-chave Ativas</h3>
+                    <div class="stat-value" id="activeKeywords">0</div>
+                    <div class="stat-change">Última atualização hoje</div>
+                </div>
+                
+                <div class="admin-stat-card">
+                    <h3><i class="fas fa-chart-line"></i> Atividades Hoje</h3>
+                    <div class="stat-value" id="todayActivities">0</div>
+                    <div class="stat-change">+8% vs ontem</div>
+                </div>
+            </section>
+
+            <!-- Seção de Palavras-chave -->
+            <section class="modern-card">
+                <div class="modern-card-header">
+                    <h2><i class="fas fa-key"></i> Gerador de Palavras-chave</h2>
+                    <p>Gere e gerencie as palavras-chave para as lives</p>
+                </div>
+                
+                <div class="keywords-admin-container">
+                    <div class="current-keywords" id="currentKeywordsAdmin">
+                        <div class="no-keywords-admin" id="noKeywordsAdmin">
+                            <i class="fas fa-clock"></i>
+                            <p>Nenhuma palavra-chave ativa no momento</p>
+                            <p class="subtitle">Clique em "Gerar Nova Palavra" para começar</p>
+                        </div>
+                        
+                        <div class="keywords-display" id="keywordsDisplay" style="display: none;">
+                            <div class="keyword-info">
+                                <h4>Palavra-chave Atual</h4>
+                                <div class="current-word" id="currentWord">-</div>
+                                <p class="keyword-details">
+                                    <span>Criada em: <span id="keywordCreatedAt">-</span></span>
+                                    <span>ID: <span id="keywordId">-</span></span>
+                                </p>
+                            </div>
+                            
+                            <div class="keywords-preview">
+                                <h4>Como aparece para os clientes:</h4>
+                                <div class="preview-options" id="previewOptions">
+                                    <!-- Opções serão inseridas aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="keywords-actions">
+                        <button class="btn-generate" onclick="generateNewKeywords()">
+                            <i class="fas fa-random"></i> Gerar Nova Palavra
+                        </button>
+                        <button class="btn-clear" onclick="clearKeywords()">
+                            <i class="fas fa-times"></i> Limpar Palavras
+                        </button>
+                        <button class="btn-attempts" onclick="clearAllAttempts()">
+                            <i class="fas fa-trash-alt"></i> Limpar Tentativas
+                        </button>
+                    </div>
+                    
+                    <div class="keyword-stats" id="keywordStats" style="display: none;">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalAttempts">0</div>
+                                <div class="stat-label">Tentativas</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="correctAttempts">0</div>
+                                <div class="stat-label">Acertos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="accuracyRate">0%</div>
+                                <div class="stat-label">Taxa de Acerto</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ações Rápidas -->
+            <section class="modern-card">
+                <div class="modern-card-header">
+                    <h2><i class="fas fa-bolt"></i> Ações Rápidas</h2>
+                </div>
+                <div class="quick-actions-grid">
+                    <div class="quick-action-card" onclick="manageUsers()">
+                        <i class="fas fa-users-cog"></i>
+                        <h4>Gerenciar Usuários</h4>
+                        <p>Adicionar, editar ou remover usuários</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="showAwardConfirmationDialog()">
+                        <i class="fas fa-trophy"></i>
+                        <h4>Confirmar Premiação</h4>
+                        <p>Confirmar ganhadores e zerar o ranking</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="exportClients()">
+                        <i class="fas fa-download"></i>
+                        <h4>Exportar Clientes</h4>
+                        <p>Baixar lista de clientes (Email, Nome, Telefone)</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="showReportsDialog()">
+                        <i class="fas fa-file-pdf"></i>
+                        <h4>Relatórios PDF</h4>
+                        <p>Gerar relatório de ranking por período</p>
+                    </div>
+                    
+                    
+                    <div class="quick-action-card" onclick="viewAuditLogs()">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h4>Logs de Auditoria</h4>
+                        <p>Visualizar atividades do sistema</p>
+                    </div>
+                    
+                    <div class="quick-action-card" onclick="manageClients()">
+                        <i class="fas fa-users"></i>
+                        <h4>Gerenciar Clientes</h4>
+                        <p>Visualizar e gerenciar clientes cadastrados</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Log de Atividades -->
+            <section class="activity-log">
+                <h3><i class="fas fa-history"></i> Atividades Recentes</h3>
+                <div id="activityList">
+                    <div class="activity-item">
+                        <div class="activity-icon login">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Login realizado</h4>
+                            <p>Usuário admin fez login no sistema</p>
+                        </div>
+                        <div class="activity-time">Agora</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Informações do Sistema -->
+            <section class="modern-card">
+                <div class="modern-card-header">
+                    <h2><i class="fas fa-info-circle"></i> Informações do Sistema</h2>
+                </div>
+                <div class="modern-card-content">
+                    <div class="modern-grid-2">
+                    <div>
+                        <h4>Usuário Atual</h4>
+                        <p><strong>Nome:</strong> <span id="currentUserName">-</span></p>
+                        <p><strong>Role:</strong> <span id="currentUserRole" class="role-badge">-</span></p>
+                        <p><strong>Permissões:</strong></p>
+                        <div id="currentUserPermissions"></div>
+                        <p><strong>Último Login:</strong> <span id="currentUserLastLogin">-</span></p>
+                    </div>
+                    
+                    <div>
+                        <h4>Status do Sistema</h4>
+                        <p><strong>Database:</strong> <span id="dbStatus">Verificando...</span></p>
+                        <p><strong>Uptime:</strong> <span id="systemUptime">-</span></p>
+                        <p><strong>Última Atualização:</strong> <span id="lastUpdate">-</span></p>
+                    </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal para Confirmar Premiação -->
+    <div id="awardConfirmationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-trophy"></i> Confirmar Premiação</h2>
+                <span class="close" onclick="closeAwardConfirmationModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <i class="fas fa-trophy" style="font-size: 48px; color: #f39c12; margin-bottom: 15px;"></i>
+                    <p style="font-size: 16px; color: #2c3e50; margin-bottom: 10px;">
+                        <strong>Atenção!</strong> Esta ação irá:
+                    </p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #2c3e50;">
+                        <li style="margin-bottom: 8px;">✅ Salvar o ranking atual como resultado final</li>
+                        <li style="margin-bottom: 8px;">✅ Registrar os ganhadores no histórico</li>
+                        <li style="margin-bottom: 8px;">⚠️ Zerar completamente o ranking de todos os clientes</li>
+                        <li style="margin-bottom: 0;">⚠️ Limpar todas as atividades e pontuações</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #856404; font-weight: 500;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Esta ação <strong>NÃO PODE SER DESFEITA</strong>. Certifique-se de que o ranking está correto antes de confirmar.
+                    </p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeAwardConfirmationModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn-primary" onclick="confirmAward()" style="background: #e74c3c;">
+                        <i class="fas fa-trophy"></i> Confirmar Premiação
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Scripts de Autenticação -->
+    <script src="../auth/AuthService.js"></script>
+    <script src="../auth/RouteGuard.js"></script>
+    
+    <!-- Database System Scripts -->
+    <script src="../database/connection.js"></script>
+    <script src="../database/models/Client.js"></script>
+    <script src="../database/models/Activity.js"></script>
+    <script src="../database/models/Keyword.js"></script>
+    <script src="../database/services/DatabaseService.js"></script>
+    <script src="../database/services/AuditService.js"></script>
+    <script src="../database/services/ErrorHandler.js"></script>
+    <script src="../database/migration/DataMigration.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="../firebase-config.js"></script>
+    
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let dashboardInitialized = false;
+        
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Inicializando dashboard administrativo...');
+            
+            // Verificar autenticação
+            if (!authService.isAuthenticated()) {
+                console.log('❌ Usuário não autenticado, redirecionando...');
+                authService.redirectToLogin();
+                return;
+            }
+            
+            // Verificar permissão para dashboard
+            if (!authService.hasPermission('view_dashboard') && !authService.hasPermission('all')) {
+                console.log('❌ Usuário sem permissão para dashboard');
+                authService.showAccessDenied();
+                return;
+            }
+            
+            // Inicializar DatabaseService globalmente
+            try {
+                if (typeof DatabaseService !== 'undefined') {
+                    console.log('🔄 Inicializando DatabaseService...');
+                    window.DatabaseService = new DatabaseService();
+                    const initialized = await window.DatabaseService.initialize();
+                    
+                    if (initialized) {
+                        console.log('✅ DatabaseService inicializado com sucesso');
+                    } else {
+                        console.log('⚠️ DatabaseService inicializado com limitações');
+                    }
+                } else {
+                    console.log('❌ DatabaseService não encontrado');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao inicializar DatabaseService:', error);
+            }
+            
+            // Inicializar interface
+            await initializeDashboard();
+            
+            // Inicializar menu hambúrguer
+            initializeHamburgerMenu();
+        });
+        
+        /**
+         * Inicializar dashboard
+         */
+        async function initializeDashboard() {
+            try {
+                // Carregar informações do usuário
+                loadUserInfo();
+                
+                // Carregar estatísticas
+                await loadStatistics();
+                
+                // Carregar atividades recentes
+                loadRecentActivities();
+                
+                // Carregar status do sistema
+                loadSystemStatus();
+                
+                // Carregar palavras-chave existentes
+                setTimeout(() => {
+                    loadExistingKeywords();
+                }, 2000); // Aguardar sistema estar totalmente carregado
+                
+                // Configurar atualizações automáticas
+                setupAutoRefresh();
+                
+                dashboardInitialized = true;
+                console.log('✅ Dashboard inicializado com sucesso');
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar dashboard:', error);
+                showMessage('Erro ao carregar dashboard', 'error');
+            }
+        }
+        
+        /**
+         * Carregar informações do usuário atual
+         */
+        function loadUserInfo() {
+            const user = authService.getCurrentUser();
+            if (user) {
+                // Avatar
+                const avatar = document.getElementById('userAvatar');
+                avatar.textContent = user.username.charAt(0).toUpperCase();
+                
+                // Nome e role na navbar
+                document.getElementById('userName').textContent = user.username;
+                document.getElementById('userRole').textContent = user.role.replace('_', ' ').toUpperCase();
+                
+                // Informações detalhadas
+                document.getElementById('currentUserName').textContent = user.username;
+                
+                const roleElement = document.getElementById('currentUserRole');
+                roleElement.textContent = user.role.replace('_', ' ').toUpperCase();
+                roleElement.className = `role-badge ${user.role}`;
+                
+                // Permissões
+                const permissionsContainer = document.getElementById('currentUserPermissions');
+                permissionsContainer.innerHTML = '';
+                
+                user.permissions.forEach(permission => {
+                    const badge = document.createElement('span');
+                    badge.className = 'permission-badge';
+                    badge.textContent = permission;
+                    permissionsContainer.appendChild(badge);
+                });
+                
+                // Último login
+                if (user.loginTime) {
+                    const loginTime = new Date(user.loginTime);
+                    document.getElementById('currentUserLastLogin').textContent = 
+                        loginTime.toLocaleString('pt-BR');
+                }
+            }
+        }
+        
+        /**
+         * Carregar estatísticas
+         */
+        async function loadStatistics() {
+            try {
+                // Total de clientes
+                if (window.FirebaseDB) {
+                    const clients = await window.FirebaseDB.getClients();
+                    document.getElementById('totalClients').textContent = clients.length;
+                }
+                
+                // Total de administradores
+                const adminUsers = authService.getAdminUsers();
+                const activeAdmins = adminUsers.filter(user => user.active).length;
+                document.getElementById('totalAdmins').textContent = activeAdmins;
+                
+                // Palavras-chave ativas
+                if (window.FirebaseDB) {
+                    const keywords = window.FirebaseDB.getCurrentKeywords();
+                    document.getElementById('activeKeywords').textContent = keywords ? 1 : 0;
+                }
+                
+                // Atividades hoje
+                if (window.FirebaseDB) {
+                    const activities = await window.FirebaseDB.getAllActivities(100);
+                    const today = new Date().toDateString();
+                    const todayActivities = activities.filter(activity => 
+                        new Date(activity.timestamp).toDateString() === today
+                    );
+                    document.getElementById('todayActivities').textContent = todayActivities.length;
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar estatísticas:', error);
+            }
+        }
+        
+        /**
+         * Carregar atividades recentes
+         */
+        function loadRecentActivities() {
+            try {
+                const logs = authService.getActivityLogs({ limit: 10 });
+                const activityList = document.getElementById('activityList');
+                activityList.innerHTML = '';
+                
+                if (logs.length === 0) {
+                    activityList.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Nenhuma atividade recente</p>';
+                    return;
+                }
+                
+                logs.forEach(log => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    
+                    const iconClass = getActivityIcon(log.action);
+                    const actionText = getActivityText(log.action, log.details);
+                    const timeText = formatTime(log.timestamp);
+                    
+                    activityItem.innerHTML = `
+                        <div class="activity-icon ${iconClass.type}">
+                            <i class="${iconClass.icon}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>${actionText.title}</h4>
+                            <p>${actionText.description}</p>
+                        </div>
+                        <div class="activity-time">${timeText}</div>
+                    `;
+                    
+                    activityList.appendChild(activityItem);
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar atividades:', error);
+            }
+        }
+        
+        /**
+         * Carregar status do sistema
+         */
+        async function loadSystemStatus() {
+            try {
+                // Status do banco de dados
+                if (window.databaseService) {
+                    const health = await window.databaseService.healthCheck();
+                    const dbStatusElement = document.getElementById('dbStatus');
+                    dbStatusElement.textContent = `${health.provider} (${health.status})`;
+                    dbStatusElement.style.color = health.status === 'available' ? '#27ae60' : '#e74c3c';
+                }
+                
+                
+                // Uptime (simulado)
+                const startTime = localStorage.getItem('system_start_time') || Date.now();
+                localStorage.setItem('system_start_time', startTime);
+                const uptime = Date.now() - parseInt(startTime);
+                document.getElementById('systemUptime').textContent = formatUptime(uptime);
+                
+                // Última atualização
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleString('pt-BR');
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar status do sistema:', error);
+            }
+        }
+        
+        /**
+         * Configurar atualização automática
+         */
+        function setupAutoRefresh() {
+            // Atualizar a cada 30 segundos
+            setInterval(async () => {
+                if (dashboardInitialized && authService.isAuthenticated()) {
+                    await loadStatistics();
+                    loadRecentActivities();
+                    loadSystemStatus();
+                }
+            }, 30000);
+        }
+        
+        /**
+         * Utilitários para atividades
+         */
+        function getActivityIcon(action) {
+            const icons = {
+                'login_success': { icon: 'fas fa-sign-in-alt', type: 'login' },
+                'login_failed': { icon: 'fas fa-exclamation-triangle', type: 'logout' },
+                'logout': { icon: 'fas fa-sign-out-alt', type: 'logout' },
+                'user_created': { icon: 'fas fa-user-plus', type: 'action' },
+                'user_updated': { icon: 'fas fa-user-edit', type: 'action' },
+                'user_deleted': { icon: 'fas fa-user-minus', type: 'logout' },
+                'data_exported': { icon: 'fas fa-download', type: 'action' }
+            };
+            
+            return icons[action] || { icon: 'fas fa-info-circle', type: 'action' };
+        }
+        
+        function getActivityText(action, details) {
+            const texts = {
+                'login_success': {
+                    title: 'Login realizado',
+                    description: `Usuário ${details.username || 'desconhecido'} fez login`
+                },
+                'login_failed': {
+                    title: 'Tentativa de login falhou',
+                    description: `Tentativa com usuário ${details.username || 'desconhecido'}`
+                },
+                'logout': {
+                    title: 'Logout realizado',
+                    description: `Usuário ${details.username || 'desconhecido'} saiu do sistema`
+                },
+                'user_created': {
+                    title: 'Usuário criado',
+                    description: `Novo usuário ${details.username || 'desconhecido'} foi criado`
+                }
+            };
+            
+            return texts[action] || {
+                title: 'Atividade do sistema',
+                description: `Ação: ${action}`
+            };
+        }
+        
+        function formatTime(timestamp) {
+            const now = new Date();
+            const time = new Date(timestamp);
+            const diff = now - time;
+            
+            if (diff < 60000) return 'Agora';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m atrás`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h atrás`;
+            
+            return time.toLocaleDateString('pt-BR');
+        }
+        
+        function formatUptime(uptime) {
+            const hours = Math.floor(uptime / 3600000);
+            const minutes = Math.floor((uptime % 3600000) / 60000);
+            
+            if (hours > 24) {
+                const days = Math.floor(hours / 24);
+                return `${days}d ${hours % 24}h`;
+            }
+            
+            return `${hours}h ${minutes}m`;
+        }
+        
+        /**
+         * Ações rápidas
+         */
+        function manageUsers() {
+            if (authService.hasPermission('manage_users') || authService.hasPermission('all')) {
+                window.location.href = 'users.html';
+            } else {
+                showMessage('Você não tem permissão para gerenciar usuários', 'error');
+            }
+        }
+        
+        function manageClients() {
+            window.location.href = 'clients.html'; // Página para gerenciar clientes
+        }
+        
+        /**
+         * Funcionalidades de palavras-chave
+         */
+        function generateNewKeywords() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar palavras-chave', 'error');
+                    return;
+                }
+                
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco ainda não carregado', 'error');
+                    return;
+                }
+                
+                showMessage('Gerando nova palavra-chave...', 'info');
+                
+                // Gerar nova palavra-chave
+                const keywordData = window.FirebaseDB.generateNewKeywords();
+                
+                if (keywordData) {
+                    displayKeywords(keywordData);
+                    showMessage('Nova palavra-chave gerada com sucesso!', 'success');
+                    
+                    // Log da atividade
+                    authService.logActivity('keywords_generated', {
+                        keywordId: keywordData.id,
+                        correctKeyword: keywordData.correct,
+                        incorrectKeywords: keywordData.incorrect
+                    });
+                } else {
+                    showMessage('Erro ao gerar palavra-chave', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar palavras-chave:', error);
+                showMessage('Erro ao gerar palavras-chave: ' + error.message, 'error');
+            }
+        }
+        
+        function clearKeywords() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar palavras-chave', 'error');
+                    return;
+                }
+                
+                if (confirm('Deseja realmente limpar as palavras-chave atuais?\n\nIsso impedirá novos participantes de responder.')) {
+                    if (typeof window.FirebaseDB !== 'undefined') {
+                        window.FirebaseDB.clearCurrentKeywords();
+                        hideKeywords();
+                        showMessage('Palavras-chave limpas com sucesso!', 'success');
+                        
+                        // Log da atividade
+                        authService.logActivity('keywords_cleared', {
+                            clearedBy: authService.getCurrentUser()?.username
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao limpar palavras-chave:', error);
+                showMessage('Erro ao limpar palavras-chave', 'error');
+            }
+        }
+        
+        function clearAllAttempts() {
+            try {
+                if (!authService.hasPermission('manage_keywords') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para gerenciar tentativas', 'error');
+                    return;
+                }
+                
+                if (confirm('Deseja realmente limpar todas as tentativas?\n\nIsso permitirá que os usuários participem novamente da palavra-chave atual.')) {
+                    if (typeof window.FirebaseDB !== 'undefined') {
+                        window.FirebaseDB.clearUserAttempts();
+                        updateKeywordStats(); // Atualizar estatísticas
+                        showMessage('Tentativas limpas com sucesso!', 'success');
+                        
+                        // Log da atividade
+                        authService.logActivity('attempts_cleared', {
+                            clearedBy: authService.getCurrentUser()?.username
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao limpar tentativas:', error);
+                showMessage('Erro ao limpar tentativas', 'error');
+            }
+        }
+        
+        /**
+         * Exibir palavras-chave na interface administrativa
+         */
+        function displayKeywords(keywordData) {
+            const noKeywords = document.getElementById('noKeywordsAdmin');
+            const keywordsDisplay = document.getElementById('keywordsDisplay');
+            
+            // Esconder mensagem de "sem palavras"
+            noKeywords.style.display = 'none';
+            keywordsDisplay.style.display = 'grid';
+            
+            // Atualizar informações da palavra atual
+            document.getElementById('currentWord').textContent = keywordData.correct;
+            document.getElementById('keywordCreatedAt').textContent = 
+                new Date(keywordData.timestamp).toLocaleString('pt-BR');
+            document.getElementById('keywordId').textContent = keywordData.id;
+            
+            // Criar preview das opções para clientes
+            const previewOptions = document.getElementById('previewOptions');
+            const allOptions = [keywordData.correct, ...keywordData.incorrect];
+            const shuffledOptions = shuffleArray([...allOptions]);
+            
+            previewOptions.innerHTML = '';
+            shuffledOptions.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = `preview-option ${option === keywordData.correct ? 'correct' : 'incorrect'}`;
+                optionDiv.textContent = option;
+                previewOptions.appendChild(optionDiv);
+            });
+            
+            // Mostrar e atualizar estatísticas
+            updateKeywordStats();
+            document.getElementById('keywordStats').style.display = 'block';
+        }
+        
+        /**
+         * Esconder palavras-chave
+         */
+        function hideKeywords() {
+            const noKeywords = document.getElementById('noKeywordsAdmin');
+            const keywordsDisplay = document.getElementById('keywordsDisplay');
+            const keywordStats = document.getElementById('keywordStats');
+            
+            noKeywords.style.display = 'block';
+            keywordsDisplay.style.display = 'none';
+            keywordStats.style.display = 'none';
+        }
+        
+        /**
+         * Atualizar estatísticas das palavras-chave
+         */
+        function updateKeywordStats() {
+            try {
+                if (typeof window.FirebaseDB === 'undefined') return;
+                
+                const currentKeywords = window.FirebaseDB.getCurrentKeywords();
+                if (!currentKeywords) return;
+                
+                // Simular estatísticas (em um sistema real, você buscaria do banco)
+                const attempts = JSON.parse(localStorage.getItem('user-attempts') || '{}');
+                const keywordAttempts = Object.values(attempts).filter(attempt => 
+                    attempt.keywordId === currentKeywords.id
+                );
+                
+                const totalAttempts = keywordAttempts.length;
+                const correctAttempts = keywordAttempts.filter(attempt => attempt.isCorrect).length;
+                const accuracyRate = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 0;
+                
+                document.getElementById('totalAttempts').textContent = totalAttempts;
+                document.getElementById('correctAttempts').textContent = correctAttempts;
+                document.getElementById('accuracyRate').textContent = accuracyRate + '%';
+                
+            } catch (error) {
+                console.error('❌ Erro ao atualizar estatísticas:', error);
+            }
+        }
+        
+        /**
+         * Carregar palavras-chave existentes na inicialização
+         */
+        async function loadExistingKeywords() {
+            try {
+                // Inicializar DatabaseService se ainda não estiver
+                if (typeof window.DatabaseService === 'undefined') {
+                    console.log('🔄 DatabaseService não encontrado, inicializando...');
+                    window.DatabaseService = new DatabaseService();
+                    await window.DatabaseService.initialize();
+                }
+                
+                // Verificar se está disponível e carregar palavras-chave
+                if (window.DatabaseService.isAvailable()) {
+                    console.log('🔑 Carregando palavras-chave do banco...');
+                    const result = await window.DatabaseService.getCurrentKeywords();
+                    
+                    if (result.success && result.data) {
+                        const keywordData = {
+                            id: result.data.id,
+                            correct: result.data.correct_word,
+                            incorrect: JSON.parse(result.data.incorrect_words),
+                            timestamp: result.data.created_at
+                        };
+                        displayKeywords(keywordData);
+                        console.log('✅ Palavras-chave carregadas do banco');
+                    } else {
+                        console.log('📭 Nenhuma palavra-chave ativa no banco');
+                    }
+                } else {
+                    console.log('⚠️ DatabaseService não disponível, tentando localStorage...');
+                    // Fallback para localStorage
+                    const saved = localStorage.getItem('currentKeywords');
+                    if (saved) {
+                        const currentKeywords = JSON.parse(saved);
+                        displayKeywords(currentKeywords);
+                        console.log('✅ Palavras-chave carregadas do localStorage');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar palavras-chave:', error);
+                // Mostrar mensagem de erro apenas se for crítico
+                if (error.message.includes('critical')) {
+                    showMessage('Erro crítico ao carregar palavras-chave', 'error');
+                }
+            }
+        }
+        
+        // Função viewReports() removida - substituída por showAwardConfirmationDialog()
+        
+        // Função para exportar clientes (CSV)
+        async function exportClients() {
+            try {
+                if (!authService.hasPermission('export_data') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para exportar dados', 'error');
+                    return;
+                }
+                
+                showMessage('Iniciando exportação de clientes...', 'info');
+                
+                const clients = await window.FirebaseDB.getClients();
+                
+                // Cabeçalho CSV
+                let csvContent = 'Email,Nome,Telefone\n';
+                
+                // Dados dos clientes
+                clients.forEach(client => {
+                    const email = (client.email || '').replace(/"/g, '""');
+                    const name = (client.name || '').replace(/"/g, '""');
+                    const phone = (client.whatsapp || client.phone || '').replace(/"/g, '""');
+                    
+                    csvContent += `"${email}","${name}","${phone}"\n`;
+                });
+                
+                // Criar e baixar arquivo
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `clientes_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                
+                showMessage(`${clients.length} clientes exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao exportar clientes:', error);
+                showMessage('Erro ao exportar clientes', 'error');
+            }
+        }
+        
+        // Função para mostrar modal de confirmação de premiação
+        function showAwardConfirmationDialog() {
+            if (!authService.hasPermission('manage_awards') && !authService.hasPermission('all')) {
+                showMessage('Você não tem permissão para confirmar premiações', 'error');
+                return;
+            }
+            
+            document.getElementById('awardConfirmationModal').style.display = 'flex';
+        }
+        
+        // Função para fechar modal de confirmação de premiação
+        function closeAwardConfirmationModal() {
+            document.getElementById('awardConfirmationModal').style.display = 'none';
+        }
+
+        // Função para confirmar premiação e zerar ranking
+        async function confirmAward() {
+            try {
+                if (!authService.hasPermission('manage_awards') && !authService.hasPermission('all')) {
+                    showMessage('Você não tem permissão para confirmar premiações', 'error');
+                    return;
+                }
+
+                console.log('🏆 Iniciando confirmação de premiação...');
+                showMessage('Processando premiação...', 'info');
+
+                // Verificar se o sistema de banco está disponível
+                if (typeof window.FirebaseDB === 'undefined') {
+                    showMessage('Sistema de banco não está disponível', 'error');
+                    return;
+                }
+
+                // Obter ranking atual
+                const rankingData = await window.FirebaseDB.getRankingData('all');
+                
+                if (!rankingData || rankingData.length === 0) {
+                    showMessage('Não há participantes no ranking para premiar', 'warning');
+                    closeAwardConfirmationModal();
+                    return;
+                }
+
+                console.log(`📊 Ranking obtido: ${rankingData.length} participantes`);
+
+                // Criar registro dos ganhadores
+                const winners = {
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString(),
+                    ranking: rankingData.slice(0, 10), // Top 10
+                    totalParticipants: rankingData.length,
+                    confirmedBy: authService.getCurrentUser()?.username || 'admin',
+                    confirmedAt: new Date().toISOString()
+                };
+
+                // Salvar ganhadores no histórico
+                try {
+                    let savedWinners = JSON.parse(localStorage.getItem('winners_history') || '[]');
+                    savedWinners.unshift(winners);
+                    localStorage.setItem('winners_history', JSON.stringify(savedWinners));
+                    console.log('✅ Ganhadores salvos no localStorage');
+                } catch (error) {
+                    console.error('❌ Erro ao salvar no localStorage:', error);
+                }
+
+                // Tentar salvar no Firebase se disponível
+                try {
+                    if (typeof window.FirebaseDB.saveWinners === 'function') {
+                        await window.FirebaseDB.saveWinners(winners);
+                        console.log('✅ Ganhadores salvos no Firebase');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Não foi possível salvar no Firebase:', error);
+                }
+
+                // Gerar PDF do ranking antes de zerar
+                await generateAwardPDF(rankingData, winners);
+
+                // Zerar o ranking
+                await clearAllRankingData();
+
+                // Fechar modal
+                closeAwardConfirmationModal();
+
+                // Atualizar estatísticas do dashboard
+                await loadStatistics();
+
+                showMessage(`Premiação confirmada! PDF gerado, ${rankingData.length} participantes foram registrados e o ranking foi zerado.`, 'success');
+
+                // Log da atividade
+                authService.logActivity('award_confirmed', {
+                    totalParticipants: rankingData.length,
+                    topWinner: rankingData[0]?.client?.name || 'N/A',
+                    topPoints: rankingData[0]?.points || 0,
+                    confirmedBy: authService.getCurrentUser()?.username
+                });
+
+                console.log('🎉 Premiação confirmada com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao confirmar premiação:', error);
+                showMessage('Erro ao confirmar premiação: ' + error.message, 'error');
+            }
+        }
+
+        // Função para gerar PDF do ranking completo na confirmação de premiação
+        async function generateAwardPDF(rankingData, winners) {
+            try {
+                console.log('📄 Gerando PDF da premiação...');
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Configurar fonte
+                doc.setFont('helvetica');
+                
+                // Header do documento
+                doc.setFontSize(24);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('RESULTADO FINAL DA PREMIAÇÃO', 20, 25);
+                
+                // Subtítulo
+                doc.setFontSize(16);
+                doc.setTextColor(52, 152, 219);
+                doc.setFont('helvetica', 'normal');
+                doc.text('ClientKey - Live Stream Competition', 20, 35);
+                
+                // Informações da premiação
+                doc.setFontSize(12);
+                doc.setTextColor(127, 140, 141);
+                const now = new Date();
+                doc.text(`Data da Premiação: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR')}`, 20, 45);
+                doc.text(`Confirmado por: ${winners.confirmedBy}`, 20, 52);
+                doc.text(`Total de Participantes: ${winners.totalParticipants}`, 20, 59);
+                
+                // Linha separadora
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, 65, 190, 65);
+                
+                let yPos = 80;
+                
+                // Título do ranking
+                doc.setFontSize(18);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('🏆 RANKING FINAL COMPLETO', 20, yPos);
+                yPos += 15;
+                
+                // Cabeçalho da tabela
+                doc.setFontSize(11);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                
+                // Fundo do cabeçalho
+                doc.setFillColor(52, 152, 219);
+                doc.rect(20, yPos - 6, 170, 10, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.text('Pos', 25, yPos);
+                doc.text('Nome do Cliente', 40, yPos);
+                doc.text('Email', 110, yPos);
+                doc.text('Pontos', 160, yPos);
+                doc.text('Últ. Atividade', 175, yPos);
+                
+                yPos += 12;
+                
+                // Dados do ranking
+                doc.setFont('helvetica', 'normal');
+                
+                rankingData.forEach((entry, index) => {
+                    // Verificar se precisa de nova página
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 25;
+                        
+                        // Repetir cabeçalho na nova página
+                        doc.setFillColor(52, 152, 219);
+                        doc.rect(20, yPos - 6, 170, 10, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFont('helvetica', 'bold');
+                        doc.text('Pos', 25, yPos);
+                        doc.text('Nome do Cliente', 40, yPos);
+                        doc.text('Email', 110, yPos);
+                        doc.text('Pontos', 160, yPos);
+                        doc.text('Últ. Atividade', 175, yPos);
+                        yPos += 12;
+                        doc.setFont('helvetica', 'normal');
+                    }
+                    
+                    // Fundo alternado para melhor leitura
+                    if (index % 2 === 0) {
+                        doc.setFillColor(248, 249, 250);
+                        doc.rect(20, yPos - 6, 170, 8, 'F');
+                    }
+                    
+                    // Destacar top 3
+                    let positionColor = [44, 62, 80]; // Cor padrão
+                    let positionText = `${index + 1}º`;
+                    
+                    if (index === 0) {
+                        positionColor = [255, 215, 0]; // Ouro
+                        positionText = '🥇 1º';
+                    } else if (index === 1) {
+                        positionColor = [192, 192, 192]; // Prata
+                        positionText = '🥈 2º';
+                    } else if (index === 2) {
+                        positionColor = [205, 127, 50]; // Bronze
+                        positionText = '🥉 3º';
+                    }
+                    
+                    // Posição
+                    doc.setTextColor(...positionColor);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(positionText, 25, yPos);
+                    
+                    // Nome (truncar se muito longo)
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', index < 3 ? 'bold' : 'normal');
+                    const name = (entry.client?.name || 'Nome não informado').toString();
+                    const truncatedName = name.length > 25 ? name.substring(0, 22) + '...' : name;
+                    doc.text(truncatedName, 40, yPos);
+                    
+                    // Email (truncar se muito longo)
+                    doc.setTextColor(127, 140, 141);
+                    doc.setFont('helvetica', 'normal');
+                    const email = (entry.client?.email || 'Email não informado').toString();
+                    const truncatedEmail = email.length > 25 ? email.substring(0, 22) + '...' : email;
+                    doc.text(truncatedEmail, 110, yPos);
+                    
+                    // Pontos
+                    doc.setTextColor(39, 174, 96);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${entry.points || 0}`, 160, yPos);
+                    
+                    // Última atividade
+                    doc.setTextColor(127, 140, 141);
+                    doc.setFont('helvetica', 'normal');
+                    const lastActivity = new Date(entry.lastActivity);
+                    const activityText = lastActivity.toLocaleDateString('pt-BR');
+                    doc.text(activityText, 175, yPos);
+                    
+                    yPos += 8;
+                });
+                
+                // Estatísticas finais
+                if (yPos > 240) {
+                    doc.addPage();
+                    yPos = 30;
+                }
+                
+                yPos += 15;
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, yPos, 190, yPos);
+                yPos += 15;
+                
+                doc.setFontSize(16);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('📊 ESTATÍSTICAS FINAIS', 20, yPos);
+                
+                yPos += 12;
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'normal');
+                
+                const totalPoints = rankingData.reduce((sum, entry) => sum + (entry.points || 0), 0);
+                const avgPoints = rankingData.length > 0 ? Math.round(totalPoints / rankingData.length) : 0;
+                
+                // Grade de estatísticas
+                const stats = [
+                    { label: 'Total de Participantes:', value: `${rankingData.length}` },
+                    { label: 'Maior Pontuação:', value: `${rankingData[0]?.points || 0} pontos` },
+                    { label: 'Campeão:', value: `${rankingData[0]?.client?.name || 'N/A'}` },
+                    { label: 'Total de Pontos Distribuídos:', value: `${totalPoints} pontos` },
+                    { label: 'Média de Pontos:', value: `${avgPoints} pontos` },
+                    { label: 'Data da Competição:', value: `${now.toLocaleDateString('pt-BR')}` }
+                ];
+                
+                stats.forEach((stat, index) => {
+                    doc.setTextColor(127, 140, 141);
+                    doc.text(stat.label, 25, yPos);
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(stat.value, 120, yPos);
+                    doc.setFont('helvetica', 'normal');
+                    yPos += 8;
+                });
+                
+                // Rodapé
+                yPos += 10;
+                doc.setDrawColor(189, 195, 199);
+                doc.line(20, yPos, 190, yPos);
+                yPos += 8;
+                
+                doc.setFontSize(9);
+                doc.setTextColor(127, 140, 141);
+                doc.text('Documento gerado automaticamente pelo sistema ClientKey', 20, yPos);
+                doc.text(`ID da Premiação: ${winners.id}`, 20, yPos + 5);
+                
+                // Salvar PDF
+                const fileName = `Premiacao_ClientKey_${now.toISOString().split('T')[0]}_${now.getHours()}h${now.getMinutes()}.pdf`;
+                doc.save(fileName);
+                
+                console.log(`✅ PDF gerado com sucesso: ${fileName}`);
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar PDF:', error);
+                showMessage('Erro ao gerar PDF: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // Função para zerar todos os dados do ranking
+        async function clearAllRankingData() {
+            try {
+                console.log('🗑️ Zerando dados do ranking...');
+
+                // Limpar atividades no Firebase
+                if (typeof window.FirebaseDB.clearAllActivities === 'function') {
+                    await window.FirebaseDB.clearAllActivities();
+                    console.log('✅ Atividades limpas no Firebase');
+                }
+
+                // Limpar dados locais dos clientes
+                if (typeof window.FirebaseDB.getClients === 'function') {
+                    const clients = await window.FirebaseDB.getClients();
+                    clients.forEach(client => {
+                        // Limpar atividades específicas do cliente
+                        localStorage.removeItem(`client_activities_${client.id}`);
+                    });
+                    console.log('✅ Atividades locais dos clientes limpas');
+                }
+
+                // Limpar tentativas de palavras-chave
+                if (typeof window.FirebaseDB.clearUserAttempts === 'function') {
+                    window.FirebaseDB.clearUserAttempts();
+                    console.log('✅ Tentativas de usuários limpas');
+                }
+
+                // Limpar cache local de atividades
+                localStorage.removeItem('recent_activities');
+                localStorage.removeItem('ranking_cache');
+
+                console.log('🎯 Ranking zerado com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro ao zerar ranking:', error);
+                throw new Error('Falha ao zerar dados do ranking: ' + error.message);
+            }
+        }
+        
+        // Função para gerar relatório PDF
+        async function generatePDFReport() {
+            try {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                const reportType = document.getElementById('reportType').value;
+                
+                if (!startDate || !endDate) {
+                    showMessage('Por favor, selecione as datas inicial e final', 'error');
+                    return;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    showMessage('A data inicial deve ser anterior à data final', 'error');
+                    return;
+                }
+                
+                showMessage('Gerando relatório PDF...', 'info');
+                
+                // Obter dados do período
+                const clients = await window.FirebaseDB.getClients();
+                const activities = await window.FirebaseDB.getAllActivities();
+                
+                // Filtrar atividades por período
+                const filteredActivities = activities.filter(activity => {
+                    const activityDate = new Date(activity.timestamp);
+                    return activityDate >= new Date(startDate) && activityDate <= new Date(endDate + 'T23:59:59');
+                });
+                
+                if (reportType === 'ranking') {
+                    await generateRankingPDF(clients, filteredActivities, startDate, endDate);
+                } else {
+                    await generateActivitiesPDF(filteredActivities, startDate, endDate);
+                }
+                
+                closeReportsModal();
+                showMessage('Relatório PDF gerado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('❌ Erro ao gerar relatório:', error);
+                showMessage('Erro ao gerar relatório: ' + error.message, 'error');
+            }
+        }
+        
+        // Função para gerar PDF de ranking
+        async function generateRankingPDF(clients, activities, startDate, endDate) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            console.log('🎯 Gerando PDF de ranking...');
+            
+            // Configurar fonte
+            doc.setFont('helvetica');
+            
+            // Título
+            doc.setFontSize(20);
+            doc.setTextColor(44, 62, 80);
+            doc.text('Relatório de Ranking - ClientKey', 20, 25);
+            
+            // Período
+            doc.setFontSize(12);
+            doc.setTextColor(127, 140, 141);
+            doc.text(`Período: ${formatDate(startDate)} até ${formatDate(endDate)}`, 20, 35);
+            doc.text(`Gerado em: ${formatDate(new Date().toISOString().split('T')[0])}`, 20, 42);
+            
+            // Calcular ranking
+            const ranking = calculateRanking(clients, activities);
+            console.log('📋 Ranking calculado:', ranking);
+            
+            // Linha separadora
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, 50, 190, 50);
+            
+            let yPos = 60;
+            
+            if (ranking.length === 0) {
+                // Caso não haja dados
+                doc.setFontSize(14);
+                doc.setTextColor(127, 140, 141);
+                doc.text('Nenhum participante com pontuação no período selecionado.', 20, yPos);
+                yPos += 20;
+                
+                doc.setFontSize(12);
+                doc.text('Possíveis motivos:', 20, yPos);
+                yPos += 10;
+                doc.text('• Não há atividades registradas no período', 25, yPos);
+                yPos += 7;
+                doc.text('• Nenhuma atividade pontuou no período', 25, yPos);
+                yPos += 7;
+                doc.text('• Problemas na correspondência entre clientes e atividades', 25, yPos);
+                
+            } else {
+                // Cabeçalho da tabela
+                doc.setFontSize(12);
+                doc.setTextColor(44, 62, 80);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Pos', 25, yPos);
+                doc.text('Nome', 40, yPos);
+                doc.text('Email', 100, yPos);
+                doc.text('Pontos', 160, yPos);
+                
+                // Linha do cabeçalho
+                doc.line(20, yPos + 3, 190, yPos + 3);
+                yPos += 13;
+                
+                // Dados do ranking
+                doc.setFont('helvetica', 'normal');
+                
+                ranking.slice(0, 20).forEach((item, index) => {
+                    // Alternar cor de fundo
+                    if (index % 2 === 0) {
+                        doc.setFillColor(248, 249, 250);
+                        doc.rect(20, yPos - 6, 170, 8, 'F');
+                    }
+                    
+                    // Posição
+                    doc.setTextColor(52, 152, 219);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${index + 1}º`, 25, yPos);
+                    
+                    // Nome (truncar se muito longo)
+                    doc.setTextColor(44, 62, 80);
+                    doc.setFont('helvetica', 'normal');
+                    const name = (item.name || 'Nome não informado').toString();
+                    const truncatedName = name.length > 25 ? name.substring(0, 25) + '...' : name;
+                    doc.text(truncatedName, 40, yPos);
+                    
+                    // Email (truncar se muito longo)
+                    doc.setTextColor(127, 140, 141);
+                    const email = (item.email || 'Email não informado').toString();
+                    const truncatedEmail = email.length > 20 ? email.substring(0, 20) + '...' : email;
+                    doc.text(truncatedEmail, 100, yPos);
+                    
+                    // Pontos
+                    doc.setTextColor(39, 174, 96);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${item.totalPoints || 0}`, 160, yPos);
+                    
+                    yPos += 10;
+                    
+                    // Nova página se necessário
+                    if (yPos > 270) {
+                        doc.addPage();
+                        yPos = 25;
+                    }
+                });
+            }
+            
+            // Resumo no final
+            if (yPos > 240) {
+                doc.addPage();
+                yPos = 30;
+            }
+            
+            yPos += 20;
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, yPos, 190, yPos);
+            yPos += 15;
+            
+            doc.setFontSize(14);
+            doc.setTextColor(44, 62, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Resumo do Período', 20, yPos);
+            
+            yPos += 10;
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total de participantes com pontuação: ${ranking.length}`, 20, yPos);
+            yPos += 7;
+            doc.text(`Total de atividades registradas: ${activities.length}`, 20, yPos);
+            yPos += 7;
+            doc.text(`Maior pontuação: ${ranking.length > 0 ? ranking[0].totalPoints : 0} pontos`, 20, yPos);
+            yPos += 7;
+            doc.text(`Total de clientes cadastrados: ${clients.length}`, 20, yPos);
+            
+            // Salvar PDF
+            doc.save(`ranking_${startDate}_a_${endDate}.pdf`);
+            console.log('✅ PDF salvo com sucesso!');
+        }
+        
+        // Função para gerar PDF de atividades
+        async function generateActivitiesPDF(activities, startDate, endDate) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configurar fonte
+            doc.setFont('helvetica');
+            
+            // Título
+            doc.setFontSize(20);
+            doc.setTextColor(44, 62, 80);
+            doc.text('Relatório de Atividades - ClientKey', 20, 25);
+            
+            // Período
+            doc.setFontSize(12);
+            doc.setTextColor(127, 140, 141);
+            doc.text(`Período: ${formatDate(startDate)} até ${formatDate(endDate)}`, 20, 35);
+            doc.text(`Gerado em: ${formatDate(new Date().toISOString().split('T')[0])}`, 20, 42);
+            
+            // Linha separadora
+            doc.setDrawColor(189, 195, 199);
+            doc.line(20, 50, 190, 50);
+            
+            // Estatísticas gerais
+            doc.setFontSize(14);
+            doc.setTextColor(44, 62, 80);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Estatísticas do Período', 20, 62);
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total de atividades: ${activities.length}`, 25, 72);
+            
+            const totalPoints = activities.reduce((sum, activity) => sum + (activity.points || 0), 0);
+            doc.text(`Total de pontos distribuídos: ${totalPoints}`, 25, 79);
+            
+            const uniqueClients = new Set(activities.map(a => a.client_email || a.clientName)).size;
+            doc.text(`Clientes únicos que participaram: ${uniqueClients}`, 25, 86);
+            
+            // Salvar PDF
+            doc.save(`atividades_${startDate}_a_${endDate}.pdf`);
+        }
+        
+        // Função auxiliar para calcular ranking
+        function calculateRanking(clients, activities) {
+            console.log('📊 Calculando ranking...');
+            console.log('Clientes recebidos:', clients.length);
+            console.log('Atividades recebidas:', activities.length);
+            
+            const clientPoints = {};
+            
+            // Inicializar clientes com 0 pontos
+            clients.forEach(client => {
+                const email = client.email.toLowerCase().trim();
+                clientPoints[email] = {
+                    name: client.name,
+                    email: client.email,
+                    totalPoints: 0,
+                    activitiesCount: 0
+                };
+            });
+            
+            console.log('Clientes inicializados:', Object.keys(clientPoints).length);
+            
+            // Somar pontos das atividades - verificar múltiplos campos
+            activities.forEach((activity, index) => {
+                // Tentar diferentes campos de email
+                const possibleEmails = [
+                    activity.client_email,
+                    activity.clientEmail, 
+                    activity.email,
+                    activity.clientId ? clients.find(c => c.id === activity.clientId)?.email : null
+                ].filter(Boolean);
+                
+                const clientEmail = possibleEmails[0];
+                if (clientEmail) {
+                    const emailKey = clientEmail.toLowerCase().trim();
+                    
+                    if (clientPoints[emailKey]) {
+                        const points = parseInt(activity.points) || 0;
+                        clientPoints[emailKey].totalPoints += points;
+                        clientPoints[emailKey].activitiesCount++;
+                        
+                        if (index < 5) { // Log apenas as primeiras 5 para debug
+                            console.log(`Atividade ${index + 1}: ${emailKey} +${points} pontos`);
+                        }
+                    } else {
+                        // Cliente não encontrado - pode ser necessário criar
+                        if (activity.clientName || activity.client_name) {
+                            clientPoints[emailKey] = {
+                                name: activity.clientName || activity.client_name || emailKey,
+                                email: clientEmail,
+                                totalPoints: parseInt(activity.points) || 0,
+                                activitiesCount: 1
+                            };
+                        }
+                    }
+                }
+            });
+            
+            // Converter para array e ordenar por pontos
+            const ranking = Object.values(clientPoints)
+                .filter(client => client.totalPoints > 0)
+                .sort((a, b) => b.totalPoints - a.totalPoints);
+            
+            console.log('Ranking final:', ranking.length, 'participantes com pontos');
+            if (ranking.length > 0) {
+                console.log('Top 3:', ranking.slice(0, 3));
+            }
+            
+            return ranking;
+        }
+        
+        // Função auxiliar para formatar data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        
+        function viewAuditLogs() {
+            if (authService.hasPermission('view_logs') || authService.hasPermission('all')) {
+                window.location.href = 'audit-logs.html';
+            } else {
+                showMessage('Você não tem permissão para visualizar logs', 'error');
+            }
+        }
+        
+        /**
+         * Logout
+         */
+        function handleLogout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                authService.logout();
+                window.location.href = '../auth/login.html';
+            }
+        }
+        
+        /**
+         * Inicializar menu hambúrguer
+         */
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+        
+        /**
+         * Função utilitária para embaralhar array
+         */
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        /**
+         * Mostrar mensagem
+         */
+        function showMessage(message, type = 'info') {
+            const messageContainer = document.getElementById('messageContainer') || document.body;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentNode) {
+                    messageContainer.removeChild(messageDiv);
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

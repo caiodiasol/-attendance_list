@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - ClientKey</title>
+    <link rel="stylesheet" href="../assets/css/ranking.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Customizações específicas para página de cadastro */
+        .register-section-centered {
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto;
+            background: var(--card-bg, #1e293b);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color, #475569);
+            padding: 24px;
+        }
+
+        .register-form {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-header h2 {
+            color: var(--text-primary, #f8fafc);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .form-header p {
+            color: var(--text-secondary, #cbd5e1);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-primary, #f8fafc);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group .form-input {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--surface-bg, #334155);
+            border: 2px solid var(--border-color, #475569);
+            border-radius: 12px;
+            color: var(--text-primary, #f8fafc);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color, #2563eb);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted, #64748b);
+        }
+
+        .form-group input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 6px;
+            display: block;
+            min-height: 18px;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .register-button:disabled {
+            background: var(--text-muted, #64748b);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .register-button .loading-spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .register-button.loading .loading-spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .clear-form-btn {
+            width: 100%;
+            padding: 12px 24px;
+            background: transparent;
+            color: var(--text-secondary, #cbd5e1);
+            border: 2px solid var(--border-color, #475569);
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .clear-form-btn:hover {
+            border-color: var(--text-secondary, #cbd5e1);
+            background: rgba(203, 213, 225, 0.1);
+        }
+
+        .info-section {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-section h4 {
+            color: var(--text-primary, #f8fafc);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-section p {
+            color: var(--text-secondary, #cbd5e1);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .info-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, var(--secondary-color, #10b981), #059669);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideInDown 0.5s ease;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .success-content h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .success-content p {
+            margin: 4px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Máscara para telefone */
+        input[type="tel"] {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Menu Hambúrguer */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .hamburger-menu:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background-color: var(--text-primary);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(-45deg) translate(-6px, 6px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(45deg) translate(-6px, -6px);
+        }
+
+        /* Dropdown menu móvel */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-nav-item:hover {
+            background-color: var(--surface-bg);
+            color: var(--text-primary);
+        }
+
+        .mobile-nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .main-nav {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .header-container {
+                position: relative;
+            }
+
+            .stats-mini {
+                display: none;
+            }
+
+            .dashboard {
+                padding: 16px;
+                min-height: calc(100vh - 70px);
+            }
+
+            .register-section-centered {
+                padding: 20px;
+            }
+
+            .form-header h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-user-plus"></i>
+                    <span class="logo-text">Cadastro Cliente</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="cadastro.html" class="nav-item active">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Cadastro</span>
+                    </a>
+                    <a href="participar.html" class="nav-item">
+                        <i class="fas fa-play"></i>
+                        <span>Participar</span>
+                    </a>
+                    <a href="ranking.html" class="nav-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Ranking</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="stat-value" id="totalClients">0</span>
+                        <span class="stat-label">Cadastrados</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="stat-value" id="todayRegistrations">0</span>
+                        <span class="stat-label">Hoje</span>
+                    </div>
+                </div>
+                <button class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </button>
+            </div>
+        </div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="cadastro.html" class="mobile-nav-item active">
+                <i class="fas fa-user-plus"></i>
+                <span>Cadastro</span>
+            </a>
+            <a href="participar.html" class="mobile-nav-item">
+                <i class="fas fa-play"></i>
+                <span>Participar</span>
+            </a>
+            <a href="ranking.html" class="mobile-nav-item">
+                <i class="fas fa-trophy"></i>
+                <span>Ranking</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard">
+        <div class="dashboard-container">
+            <!-- Seção de Cadastro Centralizada -->
+            <section class="register-section-centered">
+                <div class="register-form">
+                    <div class="form-header">
+                        <h2><i class="fas fa-user-plus"></i> Cadastro de Cliente</h2>
+                        <p>Cadastre-se para participar das lives e concorrer a prêmios!</p>
+                    </div>
+
+                    <!-- Informações sobre participação -->
+                    <div class="info-section">
+                        <h4>
+                            <i class="fas fa-info-circle"></i>
+                            Como Funciona
+                        </h4>
+                        <p>Após se cadastrar, você poderá participar das lives e concorrer a prêmios!</p>
+                        <p>Fique atento às palavras-chave durante as transmissões para ganhar pontos.</p>
+                    </div>
+
+                    <!-- Mensagem de Sucesso -->
+                    <div id="successMessage" class="success-message">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="success-content">
+                            <h3>🎉 Cadastro Realizado com Sucesso!</h3>
+                            <p><strong id="successName"></strong> foi cadastrado no sistema.</p>
+                            <p><small>📧 Email: <span id="successEmail"></span></small></p>
+                            <p><small>✅ Você já pode participar da live e concorrer aos prêmios!</small></p>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Cadastro -->
+                    <form id="clientForm">
+                        <div class="form-group">
+                            <label for="clientName">
+                                <i class="fas fa-user"></i> Nome Completo
+                            </label>
+                            <div class="form-input">
+                                <input 
+                                    type="text" 
+                                    id="clientName" 
+                                    name="name" 
+                                    placeholder="Digite seu nome completo"
+                                    required
+                                    autocomplete="name"
+                                >
+                            </div>
+                            <span class="error-message" id="nameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clientWhatsapp">
+                                <i class="fab fa-whatsapp"></i> WhatsApp <span style="color: #cbd5e1; font-weight: normal; font-size: 12px;">(opcional)</span>
+                            </label>
+                            <div class="form-input">
+                                <input 
+                                    type="tel" 
+                                    id="clientWhatsapp" 
+                                    name="whatsapp" 
+                                    placeholder="(11) 99999-9999 - (opcional)"
+                                    autocomplete="tel"
+                                    maxlength="15"
+                                >
+                            </div>
+                            <span class="error-message" id="whatsappError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clientEmail">
+                                <i class="fas fa-envelope"></i> E-mail
+                            </label>
+                            <div class="form-input">
+                                <input 
+                                    type="email" 
+                                    id="clientEmail" 
+                                    name="email" 
+                                    placeholder="Digite seu e-mail"
+                                    required
+                                    autocomplete="email"
+                                >
+                            </div>
+                            <span class="error-message" id="emailError"></span>
+                        </div>
+
+                        <button type="submit" class="register-button" id="registerBtn">
+                            <div class="loading-spinner"></div>
+                            <span id="registerBtnText">Realizar Cadastro</span>
+                        </button>
+                        
+                        <button type="button" class="clear-form-btn" onclick="clearForm()">
+                            <i class="fas fa-eraser"></i>
+                            <span>Limpar Formulário</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="message-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    
+    <!-- Database System Scripts -->
+    <script src="../database/connection.js"></script>
+    <script src="../database/models/Client.js"></script>
+    <script src="../database/models/Activity.js"></script>
+    <script src="../database/models/Keyword.js"></script>
+    <script src="../database/services/DatabaseService.js"></script>
+    <script src="../database/services/AuditService.js"></script>
+    <script src="../database/services/ErrorHandler.js"></script>
+    <script src="../database/migration/DataMigration.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="../firebase-config.js"></script>
+    <script src="../assets/js/cadastro-clientes.js"></script>
+    
+    <script>
+        // Variáveis globais
+        let isLoading = false;
+        
+        // Menu hambúrguer
+        function initializeHamburgerMenu() {
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+            const mobileMenu = document.getElementById('mobileMenu');
+
+            if (hamburgerMenu && mobileMenu) {
+                hamburgerMenu.addEventListener('click', function() {
+                    hamburgerMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (!hamburgerMenu.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        hamburgerMenu.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // Inicialização da página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🌟 Página de cadastro do cliente carregada');
+            
+            // Inicializar menu hambúrguer
+            initializeHamburgerMenu();
+            
+            // Configurar máscara de telefone
+            setupPhoneMask();
+            
+            // Aguardar sistema de banco ficar disponível
+            waitForDatabase();
+            
+            // Focar no primeiro campo
+            document.getElementById('clientName').focus();
+            
+            // Personalizar mensagens para área do cliente
+            const originalShowSuccessMessage = window.showSuccessMessage;
+            if (originalShowSuccessMessage) {
+                window.showSuccessMessage = function(name, email) {
+                    const successMessage = document.getElementById('successMessage');
+                    document.getElementById('successName').textContent = name;
+                    document.getElementById('successEmail').textContent = email;
+                    
+                    successMessage.classList.add('show');
+                    
+                    // Esconder após 8 segundos
+                    setTimeout(() => {
+                        successMessage.classList.remove('show');
+                    }, 8000);
+                    
+                    // Scroll para o topo para mostrar a mensagem
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+            }
+        });
+
+        /**
+         * Aguardar sistema de banco de dados
+         */
+        async function waitForDatabase() {
+            let attempts = 0;
+            const maxAttempts = 20;
+            
+            while (typeof window.FirebaseDB === 'undefined' && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                attempts++;
+            }
+            
+            if (typeof window.FirebaseDB !== 'undefined') {
+                console.log('✅ Sistema de banco carregado');
+                updateStats();
+            } else {
+                console.log('⚠️ Sistema de banco não carregou completamente');
+            }
+        }
+
+        /**
+         * Configurar máscara de telefone
+         */
+        function setupPhoneMask() {
+            const phoneInput = document.getElementById('clientWhatsapp');
+            
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.length <= 11) {
+                    if (value.length <= 2) {
+                        value = value.replace(/(\d{0,2})/, '($1');
+                    } else if (value.length <= 6) {
+                        value = value.replace(/(\d{2})(\d{0,4})/, '($1) $2');
+                    } else if (value.length <= 10) {
+                        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                    } else {
+                        value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+                    }
+                }
+                
+                e.target.value = value;
+            });
+        }
+        
+        /**
+         * Função para limpar formulário
+         */
+        function clearForm() {
+            const form = document.getElementById('clientForm');
+            if (form) {
+                form.reset();
+                
+                // Limpar mensagens de erro
+                document.querySelectorAll('.error-message').forEach(error => {
+                    error.textContent = '';
+                });
+                
+                // Remover classes de erro
+                document.querySelectorAll('.form-group input').forEach(input => {
+                    input.classList.remove('error');
+                });
+                
+                // Esconder mensagem de sucesso
+                document.getElementById('successMessage').classList.remove('show');
+                
+                // Focar no primeiro campo
+                document.getElementById('clientName').focus();
+            }
+        }
+
+        /**
+         * Atualizar estatísticas
+         */
+        async function updateStats() {
+            try {
+                if (typeof window.FirebaseDB === 'undefined') {
+                    return;
+                }
+                
+                const clients = await window.FirebaseDB.getClients();
+                document.getElementById('totalClients').textContent = clients.length;
+                
+                // Calcular cadastros de hoje
+                const today = new Date().toDateString();
+                const todayRegistrations = clients.filter(client => {
+                    const clientDate = new Date(client.createdAt || Date.now()).toDateString();
+                    return clientDate === today;
+                }).length;
+                
+                document.getElementById('todayRegistrations').textContent = todayRegistrations;
+                
+                console.log(`📊 Total de clientes: ${clients.length}, Hoje: ${todayRegistrations}`);
+                
+            } catch (error) {
+                console.error('Erro ao atualizar estatísticas:', error);
+            }
+        }
+    </script>
+</body>
+</html>

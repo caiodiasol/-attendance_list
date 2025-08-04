@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstração do Sistema - ClientKey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .demo-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .demo-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card.admin .feature-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .feature-card.security .feature-icon {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .feature-card.database .feature-icon {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .feature-list li {
+            color: #34495e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-list li::before {
+            content: '✅';
+            font-size: 16px;
+        }
+        
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .demo-btn.primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .demo-btn.danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .demo-btn.success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .credentials-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .credentials-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .credentials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .credential-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .credential-item.admin {
+            border-left-color: #e74c3c;
+        }
+        
+        .credential-item h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .credential-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .credential-label {
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        .credential-value {
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .system-status {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .system-status h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .status-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .status-item i {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .status-item.online i {
+            color: #27ae60;
+        }
+        
+        .status-item.protected i {
+            color: #e74c3c;
+        }
+        
+        .status-item.database i {
+            color: #3498db;
+        }
+        
+        .status-item h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .status-item p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1>🎯 ClientKey - Sistema Completo</h1>
+            <p>Demonstração do sistema de autenticação e separação admin/cliente implementado</p>
+        </div>
+        
+        <!-- Credenciais de Teste -->
+        <section class="credentials-section">
+            <h2><i class="fas fa-key"></i> Credenciais para Teste</h2>
+            <div class="credentials-grid">
+                <div class="credential-item admin">
+                    <h4><i class="fas fa-crown"></i> Super Administrador</h4>
+                    <div class="credential-detail">
+                        <span class="credential-label">Usuário:</span>
+                        <span class="credential-value" onclick="copyToClipboard('admin')">admin</span>
+                    </div>
+                    <div class="credential-detail">
+                        <span class="credential-label">Senha:</span>
+                        <span class="credential-value" onclick="copyToClipboard('admin123')">admin123</span>
+                    </div>
+                    <div class="credential-detail">
+                        <span class="credential-label">Permissões:</span>
+                        <span class="credential-value">Todas</span>
+                    </div>
+                </div>
+                
+                <div class="credential-item">
+                    <h4><i class="fas fa-user-shield"></i> Moderador</h4>
+                    <div class="credential-detail">
+                        <span class="credential-label">Usuário:</span>
+                        <span class="credential-value" onclick="copyToClipboard('moderador')">moderador</span>
+                    </div>
+                    <div class="credential-detail">
+                        <span class="credential-label">Senha:</span>
+                        <span class="credential-value" onclick="copyToClipboard('mod123')">mod123</span>
+                    </div>
+                    <div class="credential-detail">
+                        <span class="credential-label">Permissões:</span>
+                        <span class="credential-value">Limitadas</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features-grid">
+            <div class="feature-card admin">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Sistema de Autenticação</h3>
+                <p>Sistema robusto de autenticação para administradores com gestão de sessões e controle de acesso.</p>
+                <ul class="feature-list">
+                    <li>Login seguro com hash de senhas</li>
+                    <li>Gestão de sessões com timeout</li>
+                    <li>Monitoramento de atividade</li>
+                    <li>Auto-logout por inatividade</li>
+                    <li>Logs de auditoria completos</li>
+                </ul>
+                <div class="demo-actions">
+                    <a href="auth/login.html" class="demo-btn danger">
+                        <i class="fas fa-sign-in-alt"></i> Fazer Login Admin
+                    </a>
+                </div>
+            </div>
+            
+            <div class="feature-card security">
+                <div class="feature-icon">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3>Roles e Permissões</h3>
+                <p>Sistema completo de controle de acesso baseado em roles com permissões granulares.</p>
+                <ul class="feature-list">
+                    <li>Super Admin (todas permissões)</li>
+                    <li>Moderador (permissões limitadas)</li>
+                    <li>Controle de acesso por página</li>
+                    <li>Validação em tempo real</li>
+                    <li>Gerenciamento de usuários</li>
+                </ul>
+                <div class="demo-actions">
+                    <a href="admin/users.html" class="demo-btn primary">
+                        <i class="fas fa-users"></i> Gerenciar Usuários
+                    </a>
+                </div>
+            </div>
+            
+            <div class="feature-card database">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3>Separação Admin/Cliente</h3>
+                <p>Separação clara entre funcionalidades administrativas e áreas públicas para clientes.</p>
+                <ul class="feature-list">
+                    <li>Área administrativa protegida</li>
+                    <li>Interface pública para clientes</li>
+                    <li>Navegação contextual</li>
+                    <li>Redirecionamento inteligente</li>
+                    <li>Experiência otimizada</li>
+                </ul>
+                <div class="demo-actions">
+                    <a href="client/cadastro.html" class="demo-btn success">
+                        <i class="fas fa-user-plus"></i> Área do Cliente
+                    </a>
+                </div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3>Logs e Auditoria</h3>
+                <p>Sistema completo de logs administrativos com auditoria de todas as ações do sistema.</p>
+                <ul class="feature-list">
+                    <li>Log de todas as ações admin</li>
+                    <li>Filtros avançados de busca</li>
+                    <li>Exportação de dados</li>
+                    <li>Estatísticas de uso</li>
+                    <li>Monitoramento em tempo real</li>
+                </ul>
+                <div class="demo-actions">
+                    <a href="admin/audit-logs.html" class="demo-btn primary">
+                        <i class="fas fa-search"></i> Ver Logs
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Status do Sistema -->
+        <section class="system-status">
+            <h2><i class="fas fa-heartbeat"></i> Status do Sistema</h2>
+            <div class="status-grid">
+                <div class="status-item online">
+                    <i class="fas fa-check-circle"></i>
+                    <h4>Sistema Online</h4>
+                    <p>Todos os serviços funcionando</p>
+                </div>
+                
+                <div class="status-item protected">
+                    <i class="fas fa-lock"></i>
+                    <h4>Proteção Ativa</h4>
+                    <p>Rotas administrativas protegidas</p>
+                </div>
+                
+                <div class="status-item database">
+                    <i class="fas fa-database"></i>
+                    <h4>Banco Persistente</h4>
+                    <p>Dados seguros e persistentes</p>
+                </div>
+                
+                <div class="status-item online">
+                    <i class="fas fa-users"></i>
+                    <h4>Multi-usuário</h4>
+                    <p>Sistema pronto para produção</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>✨ Sistema ClientKey implementado com sucesso!</p>
+            <p>Autenticação segura • Separação admin/cliente • Controle de acesso • Logs de auditoria</p>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Mostrar feedback visual
+                const originalText = event.target.textContent;
+                event.target.textContent = 'Copiado!';
+                event.target.style.background = '#27ae60';
+                event.target.style.color = 'white';
+                
+                setTimeout(() => {
+                    event.target.textContent = originalText;
+                    event.target.style.background = 'white';
+                    event.target.style.color = '#2c3e50';
+                }, 1000);
+            });
+        }
+        
+        // Animação de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card, .credentials-section, .system-status');
+            
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>
