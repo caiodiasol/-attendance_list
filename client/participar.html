@@ -651,8 +651,7 @@
             // Inicializar menu hambúrguer
             initializeHamburgerMenu();
             
-            // Aguardar o sistema de banco estar disponível
-            console.log('⏳ Aguardando sistema de banco ficar disponível...');
+            // Aguardar o sistema de banco estar disponível (sem mostrar mensagens duplicadas)
             let attempts = 0;
             const maxAttempts = 20;
             

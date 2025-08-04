@@ -28,6 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFirebase();
     setupEventListeners();
     loadSavedEmail();
+    
+    // Verificar se há cliente salvo
+    const savedClient = localStorage.getItem('currentParticipationClient');
+    if (savedClient) {
+        try {
+            currentClient = JSON.parse(savedClient);
+            showParticipationSection();
+            loadClientData();
+        } catch (error) {
+            console.error('Erro ao carregar cliente salvo:', error);
+            localStorage.removeItem('currentParticipationClient');
+        }
+    }
 });
 
 // Função para inicializar serviços de banco de dados
@@ -39,16 +52,11 @@ async function initializeFirebase() {
             return;
         }
         
-        // Mostrar indicador de carregamento
-        showMessage('Carregando sistema de banco de dados...', 'info');
-        
-        // Verificar se DatabaseService está disponível
+        // Verificar se DatabaseService está disponível (sem mostrar mensagens duplicadas)
         if (window.DatabaseService.isAvailable()) {
             console.log('DatabaseService disponível na participação');
-            showMessage('Conectado ao banco de dados!', 'success');
         } else {
             console.log('DatabaseService não disponível, usando localStorage');
-            showMessage('Usando armazenamento local', 'info');
         }
         
         // Carregar clientes
@@ -57,7 +65,6 @@ async function initializeFirebase() {
         console.log('Sistema inicializado na participação');
     } catch (error) {
         console.error('Erro ao inicializar sistema na participação:', error);
-        showMessage('Erro ao conectar com banco de dados. Usando dados locais.', 'error');
         
         // Fallback para localStorage
         loadClientsFromStorage();
@@ -722,20 +729,6 @@ function showMessage(text, type = 'info') {
     }, 4000);
 }
 
-// Verificar se há cliente salvo ao carregar
-document.addEventListener('DOMContentLoaded', function() {
-    const savedClient = localStorage.getItem('currentParticipationClient');
-    if (savedClient) {
-        try {
-            currentClient = JSON.parse(savedClient);
-            showParticipationSection();
-            loadClientData();
-        } catch (error) {
-            console.error('Erro ao carregar cliente salvo:', error);
-            localStorage.removeItem('currentParticipationClient');
-        }
-    }
-});
 
 // Funções para controle de tentativas (anti-duplicação)
 function checkUserAttempt(email, keywordId) {

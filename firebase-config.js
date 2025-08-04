@@ -809,9 +809,67 @@ window.showMessage = function(message, type = 'success') {
     }
 };
 
+// Variável global para controlar se mensagens já foram exibidas
+window.databaseMessagesShown = window.databaseMessagesShown || false;
+
+// Função para detectar se estamos na página participar
+function isParticiparPage() {
+    return window.location.pathname.includes('participar.html') || 
+           document.title.includes('Participar') ||
+           document.querySelector('#participateBtn') !== null ||
+           document.querySelector('.participation-form') !== null;
+}
+
+// Função para mostrar mensagem de forma segura
+function safeShowMessage(message, type) {
+    // Esperar um pouco para garantir que showMessage esteja disponível
+    setTimeout(() => {
+        if (typeof window.showMessage === 'function') {
+            window.showMessage(message, type);
+        } else {
+            // Fallback: criar notificação simples
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            // Tentar criar uma notificação visual simples
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 16px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 9999;
+                max-width: 300px;
+                ${type === 'success' ? 'background: #10b981;' : ''}
+                ${type === 'error' ? 'background: #ef4444;' : ''}
+                ${type === 'info' ? 'background: #3b82f6;' : ''}
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remover após 4 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+        }
+    }, 100);
+}
+
 // Inicializar automaticamente quando o script for carregado
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🔄 Inicializando sistema de banco de dados...');
+    
+    // Detectar se estamos na página participar
+    const isParticipateView = isParticiparPage();
+    
+    if (isParticipateView && !window.databaseMessagesShown) {
+        safeShowMessage('Carregando sistema de banco de dados...', 'info');
+        window.databaseMessagesShown = true;
+    }
     
     try {
         await initializeDatabaseService();
@@ -823,14 +881,32 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log(`✅ Sistema inicializado: ${healthCheck.provider}`);
             console.log(`📊 Status: ${healthCheck.status}`);
             
-            if (healthCheck.status === 'unavailable') {
+            // Mostrar mensagem de sucesso apenas na página participar
+            if (isParticipateView) {
+                if (healthCheck.status === 'unavailable') {
+                    console.log('⚠️ Banco de dados não disponível, usando localStorage como fallback');
+                    safeShowMessage('Conectado ao sistema local!', 'success');
+                } else {
+                    safeShowMessage('Conectado ao banco de dados!', 'success');
+                }
+            } else if (healthCheck.status === 'unavailable') {
                 console.log('⚠️ Banco de dados não disponível, usando localStorage como fallback');
+            }
+        } else {
+            // Se não houver healthCheck, mas estamos na página participar, mostrar mensagem de fallback
+            if (isParticipateView) {
+                safeShowMessage('Sistema conectado!', 'success');
             }
         }
         
     } catch (error) {
         console.error('❌ Erro ao inicializar sistema:', error);
         console.log('📦 Sistema funcionará apenas com localStorage');
+        
+        // Mostrar mensagem de erro apenas na página participar
+        if (isParticipateView) {
+            safeShowMessage('Sistema funcionando em modo offline', 'info');
+        }
     }
 });
 
